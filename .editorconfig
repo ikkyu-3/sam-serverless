@@ -5,11 +5,6 @@ end_of_line = lf
 trim_trailing_whitespace = ture
 charset = utf-8
 
-[*.{ts,yaml,md}]
-indent_style = space
-indent_size = 2
-
-
-[package.json]
+[*.{ts,yaml,md,json}]
 indent_style = space
 indent_size = 2
