@@ -1,0 +1,22 @@
+{
+  "name": "sam-serverless",
+  "version": "0.0.0",
+  "description": "sta-access-manager-server × serverless × TypeScript",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ikkyu-3/sam-serverless.git"
+  },
+  "author": "",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/ikkyu-3/sam-serverless/issues"
+  },
+  "homepage": "https://github.com/ikkyu-3/sam-serverless#readme",
+  "devDependencies": {
+    "typescript": "^3.2.1"
+  }
+}
