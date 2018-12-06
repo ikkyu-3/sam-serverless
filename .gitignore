@@ -60,4 +60,12 @@ typings/
 # next.js build output
 .next
 
-handlers/
+# package directories
+node_modules
+jspm_packages
+
+# Serverless directories
+.serverless
+
+serverless/handler.js
+serverless/handler.js.map

@@ -17,11 +17,14 @@
   },
   "homepage": "https://github.com/ikkyu-3/sam-serverless#readme",
   "devDependencies": {
+    "@types/aws-lambda": "^8.10.15",
     "@types/jest": "^23.3.10",
+    "@types/node": "^10.12.12",
     "husky": "^1.2.0",
     "jest": "^23.6.0",
     "lint-staged": "^8.1.0",
     "prettier": "^1.15.3",
+    "serverless": "^1.34.1",
     "ts-jest": "^23.10.5",
     "tslint": "^5.11.0",
     "tslint-plugin-prettier": "^2.0.1",
@@ -34,8 +37,11 @@
   },
   "lint-staged": {
     "*.ts": [
-      "eslint --fix",
+      "tslint --fix",
       "git add"
     ]
+  },
+  "dependencies": {
+    "aws-sdk": "^2.372.0"
   }
 }

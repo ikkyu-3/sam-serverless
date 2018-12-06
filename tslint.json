@@ -5,7 +5,11 @@
   ],
   "jsRules": {},
   "rules": {
-    "prettier": true
+    "prettier": true,
+    "no-console": false
   },
-  "rulesDirectory": ["tslint-plugin-prettier"]
+  "rulesDirectory": ["tslint-plugin-prettier"],
+  "linterOptions": {
+    "exclude": ["serverless/*.js"]
+}
 }
