@@ -1,34 +1,39 @@
+import * as AWS from "aws-sdk";
+
 export interface ILambdaResponse {
   statusCode: number;
   headers: object;
   body: string;
 }
 
-
 class LambdaResponse {
-  public static ok(message: string = "OK"): ILambdaResponse {
-    return LambdaResponse.createResponse(200, message);
+  public static awsError(e: AWS.AWSError): ILambdaResponse {
+    return LambdaResponse.createResponse(e.statusCode, { message: e.message });
   }
 
-  public static created(message: string = "Created"): ILambdaResponse {
-    return LambdaResponse.createResponse(201, message);
+  public static ok(body: object = { message: "OK" }): ILambdaResponse {
+    return LambdaResponse.createResponse(200, body);
   }
 
-  public static badRequest(message: string = "Bad Request"): ILambdaResponse {
-    return LambdaResponse.createResponse(400, message);
+  public static created(body: object = { message: "Created" }): ILambdaResponse {
+    return LambdaResponse.createResponse(201, body);
   }
 
-  public static notFound(message: string = "Not Found"): ILambdaResponse {
-    return LambdaResponse.createResponse(404, message);
+  public static badRequest(body: object = { message: "Bad Request" }): ILambdaResponse {
+    return LambdaResponse.createResponse(400, body);
   }
 
-  public static internalServerError(message: string = "Internal Server Error"): ILambdaResponse {
-    return LambdaResponse.createResponse(500, message);
+  public static notFound(body: object = { message: "Not Found" }): ILambdaResponse {
+    return LambdaResponse.createResponse(404, body);
   }
 
-  private static createResponse(statusCode: number, body: string): ILambdaResponse {
+  public static internalServerError(body: object = { message: "Internal Server Error" }): ILambdaResponse {
+    return LambdaResponse.createResponse(500, body);
+  }
+
+  private static createResponse(statusCode: number, body: object): ILambdaResponse {
     return {
-      body,
+      body: JSON.stringify(body),
       headers: {
         "Access-Control-Allow-Credentials": true,
         "Access-Control-Allow-Origin": "*",
