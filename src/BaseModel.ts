@@ -38,6 +38,15 @@ class BaseModel {
     }
   }
 
+  protected async update(params: AWS.DynamoDB.DocumentClient.UpdateItemInput): Promise<AWS.DynamoDB.DocumentClient.UpdateItemOutput | AWS.AWSError> {
+    try {
+      const response = await this.documentClient.update(params).promise();
+      return response;
+    } catch (error) {
+      return error as AWS.AWSError;
+    }
+  }
+
   protected async query(params: AWS.DynamoDB.DocumentClient.QueryInput): Promise<AWS.DynamoDB.DocumentClient.QueryOutput | AWS.AWSError> {
     try {
       const response = await this.documentClient.query(params).promise();
