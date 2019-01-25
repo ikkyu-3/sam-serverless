@@ -12,7 +12,8 @@
         "semi": ["error", "always-multiline"]
       }
     ],
-    "no-console": false
+    "no-console": false,
+    "object-literal-sort-keys": false
   },
   "rulesDirectory": ["tslint-plugin-prettier"],
   "linterOptions": {

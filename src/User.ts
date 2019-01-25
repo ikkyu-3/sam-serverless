@@ -8,30 +8,28 @@ export interface IUserBody {
   name: string;
 }
 
-interface IUserItem {
+export interface IUserItem {
   cardId: string;
   userId: string;
   name: string;
   status: boolean;
   createdAt: string;
   updatedAt?: string;
+  version: number;
 }
 
 class User extends BaseModel {
   private readonly USERS_TABLE = process.env.USERS_TABLE || "";
 
-  public async findByCardId(cardId: string): Promise<IUserItem | Error> {
+
+  public async findByCardId(cardId: string): Promise<IUserItem | undefined | AWS.AWSError> {
     const response = await this.get({
       Key: { cardId },
       TableName: this.USERS_TABLE,
     });
 
-    if (this.isError(response)) {
+    if (this.isAWSError(response)) {
       return response;
-    }
-
-    if (!response.Item) {
-      return new Error("not found");
     }
 
     return response.Item as IUserItem;
@@ -39,34 +37,59 @@ class User extends BaseModel {
 
   public async save({ cardId, userId, name }: IUserBody): Promise<ILambdaResponse> {
     const findResponse = await this.findByCardId(cardId);
-
-    if (this.isError(findResponse)) {
-      return LambdaResponse.notFound();
+    if (this.isAWSError(findResponse)) {
+      return LambdaResponse.awsError(findResponse);
     }
 
     const now = new Date().toISOString();
-    const putParams: AWS.DynamoDB.DocumentClient.PutItemInput = {
-      Item: {
-        cardId,
-        createdAt: now,
-        name,
-        status: true,
-        userId,
-      },
-      TableName: this.USERS_TABLE,
-    };
+    if (typeof findResponse !== "undefined") {
+      if (findResponse.userId === userId) {
+        const updateResponse = await this.update({
+          TableName: this.USERS_TABLE,
+          Key: { cardId },
+          UpdateExpression: "set #n = :n, #u = :u, #v = :newVersion",
+          ConditionExpression: "#v = :v",
+          ExpressionAttributeNames: {
+            "#n": "name",
+            "#u": "updatedAt",
+            "#v": "version",
+          },
+          ExpressionAttributeValues: {
+            ":n": name,
+            ":u": now,
+            ":v": findResponse.version,
+            ":newVersion": findResponse.version + 1,
+          }
+        });
 
-    if (findResponse) {
-      putParams.Item.createdAt = findResponse.createdAt;
-      putParams.Item.updatedAt = now;
+        if (this.isAWSError(updateResponse)) {
+          return LambdaResponse.awsError(updateResponse);
+        }
+
+        return LambdaResponse.created();
+      } else {
+        return LambdaResponse.badRequest();
+      }
+    } else {
+      const putResponse = await this.put({
+        Item: {
+          cardId,
+          createdAt: now,
+          name,
+          status: true,
+          userId,
+          version: 0,
+        },
+        TableName: this.USERS_TABLE,
+      });
+
+      if (this.isAWSError(putResponse)) {
+        return LambdaResponse.awsError(putResponse);
+      }
+
+      return LambdaResponse.created();
     }
-
-    const putResponse = await this.put(putParams);
-    if (this.isError(putResponse)) {
-      return LambdaResponse.badRequest();
-    }
-
-    return LambdaResponse.created();
   }
+
 }
 export default User;
