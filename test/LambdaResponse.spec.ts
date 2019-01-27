@@ -5,10 +5,9 @@ const baseResponse = {
     "Access-Control-Allow-Credentials": true,
     "Access-Control-Allow-Origin": "*",
   },
-}
+};
 const obj = { test: "test" };
 const objStr = JSON.stringify(obj);
-
 
 describe("LamdbaResponse.ts", () => {
   describe("awsError", () => {
@@ -19,7 +18,7 @@ describe("LamdbaResponse.ts", () => {
         ...baseResponse,
         body: JSON.stringify({ message: awsError.message }),
         statusCode: awsError.statusCode,
-      })
+      });
     });
   });
 
@@ -28,7 +27,7 @@ describe("LamdbaResponse.ts", () => {
       const result = LambdaResponse.ok();
       expect(result).toEqual({
         ...baseResponse,
-        body: JSON.stringify({ message: "OK"}),
+        body: JSON.stringify({ message: "OK" }),
         statusCode: 200,
       });
     });
@@ -44,7 +43,7 @@ describe("LamdbaResponse.ts", () => {
       const result = LambdaResponse.created();
       expect(result).toEqual({
         ...baseResponse,
-        body: JSON.stringify({ message: "Created"}),
+        body: JSON.stringify({ message: "Created" }),
         statusCode: 201,
       });
     });

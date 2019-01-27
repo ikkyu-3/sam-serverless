@@ -15,23 +15,34 @@ class LambdaResponse {
     return LambdaResponse.createResponse(200, body);
   }
 
-  public static created(body: object = { message: "Created" }): ILambdaResponse {
+  public static created(
+    body: object = { message: "Created" }
+  ): ILambdaResponse {
     return LambdaResponse.createResponse(201, body);
   }
 
-  public static badRequest(body: object = { message: "Bad Request" }): ILambdaResponse {
+  public static badRequest(
+    body: object = { message: "Bad Request" }
+  ): ILambdaResponse {
     return LambdaResponse.createResponse(400, body);
   }
 
-  public static notFound(body: object = { message: "Not Found" }): ILambdaResponse {
+  public static notFound(
+    body: object = { message: "Not Found" }
+  ): ILambdaResponse {
     return LambdaResponse.createResponse(404, body);
   }
 
-  public static internalServerError(body: object = { message: "Internal Server Error" }): ILambdaResponse {
+  public static internalServerError(
+    body: object = { message: "Internal Server Error" }
+  ): ILambdaResponse {
     return LambdaResponse.createResponse(500, body);
   }
 
-  private static createResponse(statusCode: number, body: object): ILambdaResponse {
+  private static createResponse(
+    statusCode: number,
+    body: object
+  ): ILambdaResponse {
     return {
       body: JSON.stringify(body),
       headers: {
@@ -39,7 +50,7 @@ class LambdaResponse {
         "Access-Control-Allow-Origin": "*",
       },
       statusCode,
-    }
+    };
   }
 }
 

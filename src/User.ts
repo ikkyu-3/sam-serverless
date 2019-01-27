@@ -21,8 +21,9 @@ export interface IUserItem {
 class User extends BaseModel {
   private readonly USERS_TABLE = process.env.USERS_TABLE || "";
 
-
-  public async findByCardId(cardId: string): Promise<IUserItem | undefined | AWS.AWSError> {
+  public async findByCardId(
+    cardId: string
+  ): Promise<IUserItem | undefined | AWS.AWSError> {
     const response = await this.get({
       Key: { cardId },
       TableName: this.USERS_TABLE,
@@ -35,7 +36,11 @@ class User extends BaseModel {
     return response.Item as IUserItem;
   }
 
-  public async save({ cardId, userId, name }: IUserBody): Promise<ILambdaResponse> {
+  public async save({
+    cardId,
+    userId,
+    name,
+  }: IUserBody): Promise<ILambdaResponse> {
     const findResponse = await this.findByCardId(cardId);
     if (this.isAWSError(findResponse)) {
       return LambdaResponse.awsError(findResponse);
@@ -59,7 +64,7 @@ class User extends BaseModel {
             ":u": now,
             ":v": findResponse.version,
             ":newVersion": findResponse.version + 1,
-          }
+          },
         });
 
         if (this.isAWSError(updateResponse)) {
@@ -90,6 +95,5 @@ class User extends BaseModel {
       return LambdaResponse.created();
     }
   }
-
 }
 export default User;

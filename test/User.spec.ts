@@ -1,3 +1,4 @@
+/* tslint:disable no-console */
 import * as AWS from "aws-sdk";
 import User, { IUserItem } from "../src/User";
 
@@ -15,11 +16,11 @@ const createTableInput: AWS.DynamoDB.CreateTableInput = {
     {
       AttributeName: "cardId",
       KeyType: "HASH",
-    }
+    },
   ],
   ProvisionedThroughput: {
     ReadCapacityUnits: 1,
-    WriteCapacityUnits: 1
+    WriteCapacityUnits: 1,
   },
   TableName: tableName,
 };
@@ -33,19 +34,21 @@ describe("BaseModel.ts", () => {
   beforeAll(async () => {
     try {
       await dynamo.createTable(createTableInput).promise();
-      await dynamo.putItem({
-        Item: {
-          cardId: { S: "xxxxxxxxxxxxxxxx" },
-          createdAt: { S: "YYYY-MM-DDTHH:mm:ss.sss" },
-          name: { S: "name" },
-          status: { BOOL: true },
-          userId: { S: "0000000001" },
-          version: { N: "0" },
-        },
-        ReturnConsumedCapacity: "TOTAL",
-        TableName: tableName,
-      }).promise();
-    } catch(e) {
+      await dynamo
+        .putItem({
+          Item: {
+            cardId: { S: "xxxxxxxxxxxxxxxx" },
+            createdAt: { S: "YYYY-MM-DDTHH:mm:ss.sss" },
+            name: { S: "name" },
+            status: { BOOL: true },
+            userId: { S: "0000000001" },
+            version: { N: "0" },
+          },
+          ReturnConsumedCapacity: "TOTAL",
+          TableName: tableName,
+        })
+        .promise();
+    } catch (e) {
       console.error("初期化に失敗しました。", e);
     }
   });
@@ -60,7 +63,9 @@ describe("BaseModel.ts", () => {
 
   describe("findByCardId", () => {
     it("cardIdに該当する項目を取得できる", async () => {
-      const response = await user.findByCardId("xxxxxxxxxxxxxxxx") as IUserItem;
+      const response = (await user.findByCardId(
+        "xxxxxxxxxxxxxxxx"
+      )) as IUserItem;
       expect(response.userId).toBe("0000000001");
       expect(response.name).toBe("name");
       expect(response.status).toBe(true);
@@ -84,10 +89,12 @@ describe("BaseModel.ts", () => {
       expect(response.statusCode).toBe(201);
 
       // 検証
-      const newUser = await dynamo.getItem({
-        Key: { cardId: { S: "zzzzzzzzzzzzzzzz" } },
-        TableName: tableName,
-      }).promise() as AWS.DynamoDB.GetItemOutput;
+      const newUser = (await dynamo
+        .getItem({
+          Key: { cardId: { S: "zzzzzzzzzzzzzzzz" } },
+          TableName: tableName,
+        })
+        .promise()) as AWS.DynamoDB.GetItemOutput;
       expect(newUser.Item!.userId.S).toBe("0000000002");
       expect(newUser.Item!.name.S).toBe("name2");
       expect(newUser.Item!.status.BOOL).toBe(true);
@@ -105,10 +112,12 @@ describe("BaseModel.ts", () => {
       expect(response.statusCode).toBe(201);
 
       // 検証
-      const newUser = await dynamo.getItem({
-        Key: { cardId: { S: "zzzzzzzzzzzzzzzz" } },
-        TableName: tableName,
-      }).promise() as AWS.DynamoDB.GetItemOutput;
+      const newUser = (await dynamo
+        .getItem({
+          Key: { cardId: { S: "zzzzzzzzzzzzzzzz" } },
+          TableName: tableName,
+        })
+        .promise()) as AWS.DynamoDB.GetItemOutput;
       expect(newUser.Item!.name.S).toBe("名前2");
       expect(newUser.Item!.updatedAt.S).toEqual(expect.any(String));
       expect(newUser.Item!.version.N).toBe("1");

@@ -8,7 +8,7 @@ export interface IAccessBody {
 }
 
 interface IRecord {
-  entranceTime: string;
+  entryTime: string;
   exitTime?: string;
   purpose: string;
 }
@@ -23,11 +23,12 @@ interface IAccessItem {
   version: number;
 }
 
-interface IUser {
+export interface IUser {
+  userId: string;
   name: string;
   purpose: string;
   isEntry: boolean;
-  entiryTime: string;
+  entryTime: string;
   exitTime?: string;
 }
 
@@ -47,17 +48,22 @@ class Access extends BaseModel {
 
     const record = response.records[response.records.length - 1];
     const user: IUser = {
-      name,
+      userId: response.userId,
+      name: response.name,
       purpose: record.purpose,
-      isEntry: !!record.exitTime,
-      entiryTime: record.entranceTime,
+      isEntry: !record.exitTime,
+      entryTime: record.entryTime,
       exitTime: record.exitTime,
     };
 
     return LambdaResponse.ok(user);
   }
 
-  public async entryByUserId(userId: string, name: string, purpose: string): Promise<ILambdaResponse> {
+  public async entryByUserId(
+    userId: string,
+    name: string,
+    purpose: string
+  ): Promise<ILambdaResponse> {
     // GET
     const accessItem = await this.findByUserId(userId);
     if (this.isAWSError(accessItem)) {
@@ -73,10 +79,12 @@ class Access extends BaseModel {
         userId,
         date,
         name,
-        records: [{
-          entranceTime: now,
-          purpose,
-        }],
+        records: [
+          {
+            entryTime: now,
+            purpose,
+          },
+        ],
         createdAt: now,
         version: 0,
       };
@@ -97,10 +105,11 @@ class Access extends BaseModel {
       const response = await this.update({
         TableName: this.ACCESSES_TABLE,
         Key: { userId, date },
-        UpdateExpression: 'set #r = list_append(:r, :i), #u = :u, #v = :newVersion',
+        UpdateExpression:
+          "set #r = list_append(:r, :i), #u = :u, #v = :newVersion",
         ConditionExpression: "#v = :v",
         ExpressionAttributeNames: {
-          "#r": "record",
+          "#r": "records",
           "#u": "updatedAt",
           "#v": "version",
         },
@@ -110,7 +119,7 @@ class Access extends BaseModel {
           ":u": now,
           ":v": accessItem.version,
           ":newVersion": accessItem.version + 1,
-        }
+        },
       });
 
       if (this.isAWSError(response)) {
@@ -140,19 +149,19 @@ class Access extends BaseModel {
     const response = await this.update({
       TableName: this.ACCESSES_TABLE,
       Key: { userId, date },
-      UpdateExpression: 'set #r = :r, #u = :u, #v = :newVersion',
+      UpdateExpression: "set #r = :r, #u = :u, #v = :newVersion",
       ConditionExpression: "#v = :v",
       ExpressionAttributeNames: {
-        "#r": "record",
+        "#r": "records",
         "#u": "updatedAt",
         "#v": "version",
       },
       ExpressionAttributeValues: {
-        ":r": currentRcord,
+        ":r": accessItem.records,
         ":u": now,
         ":v": accessItem.version,
         ":newVersion": accessItem.version + 1,
-      }
+      },
     });
 
     if (this.isAWSError(response)) {
@@ -177,13 +186,14 @@ class Access extends BaseModel {
 
     // レスポンスデータを作成
     const users: IUser[] = [];
-    (response.Items! as IAccessItem[]).forEach(({ name, records }) => {
+    (response.Items! as IAccessItem[]).forEach(({ userId, name, records }) => {
       const record = records[records.length - 1];
       const user: IUser = {
+        userId,
         name,
         purpose: record.purpose,
         isEntry: !record.exitTime,
-        entiryTime: record.entranceTime,
+        entryTime: record.entryTime,
         exitTime: record.exitTime,
       };
       users.push(user);
@@ -192,7 +202,9 @@ class Access extends BaseModel {
     return LambdaResponse.ok(users);
   }
 
-  private async findByUserId(userId: string): Promise<IAccessItem | undefined | AWS.AWSError> {
+  private async findByUserId(
+    userId: string
+  ): Promise<IAccessItem | undefined | AWS.AWSError> {
     const date = this.createTodayString();
 
     const response = await this.get({
