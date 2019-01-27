@@ -1,8 +1,8 @@
 import * as AWS from "aws-sdk";
 import User, { IUserItem } from "../src/User";
 
-const tableName = "User";
-process.env.USERS_TABLE = "User";
+const tableName = "Users";
+process.env.USERS_TABLE = "Users";
 
 const createTableInput: AWS.DynamoDB.CreateTableInput = {
   AttributeDefinitions: [
@@ -18,8 +18,8 @@ const createTableInput: AWS.DynamoDB.CreateTableInput = {
     }
   ],
   ProvisionedThroughput: {
-    ReadCapacityUnits: 5,
-    WriteCapacityUnits: 5
+    ReadCapacityUnits: 1,
+    WriteCapacityUnits: 1
   },
   TableName: tableName,
 };
