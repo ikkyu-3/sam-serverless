@@ -1,12 +1,7 @@
 import * as AWS from "aws-sdk";
 import BaseModel from "./BaseModel";
 import LambdaResponse, { ILambdaResponse } from "./LambdaResponse";
-
-export interface IUserBody {
-  cardId: string;
-  userId: string;
-  name: string;
-}
+import { IUserSaveBody } from "./Validation";
 
 export interface IUserItem {
   cardId: string;
@@ -40,7 +35,7 @@ class User extends BaseModel {
     cardId,
     userId,
     name,
-  }: IUserBody): Promise<ILambdaResponse> {
+  }: IUserSaveBody): Promise<ILambdaResponse> {
     const findResponse = await this.findByCardId(cardId);
     if (this.isAWSError(findResponse)) {
       return LambdaResponse.awsError(findResponse);
