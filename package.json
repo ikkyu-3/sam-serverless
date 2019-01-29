@@ -4,7 +4,7 @@
   "description": "sta-access-manager-server × serverless × TypeScript",
   "main": "index.js",
   "scripts": {
-    "test": "jest"
+    "test": "jest --runInBand --forceExit --detectOpenHandles"
   },
   "repository": {
     "type": "git",
