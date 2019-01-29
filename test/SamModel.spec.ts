@@ -1,8 +1,15 @@
 /* tslint:disable no-console */
 import * as AWS from "aws-sdk";
-import BaseModel from "../src/BaseModel";
+import SamModel from "../src/SamModel";
+import {
+  createTestTableInput,
+  endpoint,
+  region,
+  testItemInput,
+  testTable,
+} from "./testData";
 
-class TestModel extends BaseModel {
+class TestModel extends SamModel {
   constructor(
     options: AWS.DynamoDB.DocumentClient.DocumentClientOptions &
       AWS.DynamoDB.Types.ClientConfiguration
@@ -38,48 +45,14 @@ class TestModel extends BaseModel {
   }
 }
 
-const tableName = "Test";
-
-const createTableInput: AWS.DynamoDB.CreateTableInput = {
-  AttributeDefinitions: [
-    {
-      AttributeName: "Id",
-      AttributeType: "S",
-    },
-  ],
-  KeySchema: [
-    {
-      AttributeName: "Id",
-      KeyType: "HASH",
-    },
-  ],
-  ProvisionedThroughput: {
-    ReadCapacityUnits: 5,
-    WriteCapacityUnits: 5,
-  },
-  TableName: tableName,
-};
-
-const endpoint = "http://localhost:8000";
-const region = "ap-northeast-1";
-
 describe("BaseModel.ts", () => {
   const dynamo = new AWS.DynamoDB({ endpoint, region });
   const testModel = new TestModel({ endpoint, region });
 
   beforeAll(async () => {
     try {
-      await dynamo.createTable(createTableInput).promise();
-      await dynamo
-        .putItem({
-          Item: {
-            Id: { S: "001" },
-            Name: { S: "名前" },
-          },
-          ReturnConsumedCapacity: "TOTAL",
-          TableName: tableName,
-        })
-        .promise();
+      await dynamo.createTable(createTestTableInput).promise();
+      await dynamo.putItem(testItemInput).promise();
     } catch (e) {
       console.error("初期化に失敗しました。", e);
     }
@@ -87,7 +60,7 @@ describe("BaseModel.ts", () => {
 
   afterAll(async () => {
     try {
-      await dynamo.deleteTable({ TableName: tableName }).promise();
+      await dynamo.deleteTable({ TableName: testTable }).promise();
     } catch (e) {
       console.error("テーブル削除に失敗しました。", e);
     }
@@ -112,7 +85,7 @@ describe("BaseModel.ts", () => {
     it("指定した項目が取得できる", async () => {
       const response = (await testModel.get({
         Key: { Id: "001" },
-        TableName: tableName,
+        TableName: testTable,
       })) as AWS.DynamoDB.DocumentClient.GetItemOutput;
       expect(response).toEqual({
         Item: { Id: "001", Name: "名前" },
@@ -122,7 +95,7 @@ describe("BaseModel.ts", () => {
     it("該当がない場合は、空のオブジェクトが取得できる", async () => {
       const response = (await testModel.get({
         Key: { Id: "002" },
-        TableName: tableName,
+        TableName: testTable,
       })) as AWS.DynamoDB.DocumentClient.GetItemOutput;
       expect(response).toEqual({});
     });
@@ -130,7 +103,7 @@ describe("BaseModel.ts", () => {
     it("例外が発生した場合は、AWSErrorを返す", async () => {
       const response = (await testModel.get({
         Key: {},
-        TableName: tableName,
+        TableName: testTable,
       })) as AWS.AWSError;
       expect(response.statusCode).toEqual(expect.any(Number));
       expect(response.message).toEqual(expect.any(String));
@@ -141,7 +114,7 @@ describe("BaseModel.ts", () => {
     it("項目を追加できる", async () => {
       await testModel.put({
         Item: { Id: "002", Name: "name" },
-        TableName: tableName,
+        TableName: testTable,
       });
 
       // 検証
@@ -152,7 +125,7 @@ describe("BaseModel.ts", () => {
               S: "002",
             },
           },
-          TableName: tableName,
+          TableName: testTable,
         })
         .promise()) as AWS.DynamoDB.GetItemOutput;
       expect(response.Item!.Id.S).toBe("002");
@@ -162,7 +135,7 @@ describe("BaseModel.ts", () => {
     it("項目を変更できる", async () => {
       await testModel.put({
         Item: { Id: "002", Name: "name2", Age: 31 },
-        TableName: tableName,
+        TableName: testTable,
       });
 
       // 検証
@@ -171,7 +144,7 @@ describe("BaseModel.ts", () => {
           Key: {
             Id: { S: "002" },
           },
-          TableName: tableName,
+          TableName: testTable,
         })
         .promise()) as AWS.DynamoDB.GetItemOutput;
       expect(response.Item!.Id.S).toBe("002");
@@ -182,7 +155,7 @@ describe("BaseModel.ts", () => {
     it("例外が発生した場合は、AWSErrorを返す", async () => {
       const response = (await testModel.put({
         Item: {},
-        TableName: tableName,
+        TableName: testTable,
       })) as AWS.AWSError;
       expect(response.statusCode).toEqual(expect.any(Number));
       expect(response.message).toEqual(expect.any(String));
@@ -198,7 +171,7 @@ describe("BaseModel.ts", () => {
             Name: { S: "名前3" },
           },
           ReturnConsumedCapacity: "TOTAL",
-          TableName: tableName,
+          TableName: testTable,
         })
         .promise();
 
@@ -206,7 +179,7 @@ describe("BaseModel.ts", () => {
         ExpressionAttributeNames: { "#n": "Name" },
         ExpressionAttributeValues: { ":n": "name3" },
         Key: { Id: "003" },
-        TableName: tableName,
+        TableName: testTable,
         UpdateExpression: "SET #n = :n",
       });
 
@@ -215,7 +188,7 @@ describe("BaseModel.ts", () => {
           Key: {
             Id: { S: "003" },
           },
-          TableName: tableName,
+          TableName: testTable,
         })
         .promise()) as AWS.DynamoDB.GetItemOutput;
 
@@ -228,7 +201,7 @@ describe("BaseModel.ts", () => {
         ExpressionAttributeNames: { "#n": "Name" },
         ExpressionAttributeValues: { ":n": "name3" },
         Key: { Id: "003" },
-        TableName: tableName,
+        TableName: testTable,
       })) as AWS.AWSError;
 
       expect(response.statusCode).toEqual(expect.any(Number));
@@ -242,7 +215,7 @@ describe("BaseModel.ts", () => {
         ExpressionAttributeNames: { "#key": "Id" },
         ExpressionAttributeValues: { ":value": "001" },
         KeyConditionExpression: "#key = :value",
-        TableName: tableName,
+        TableName: testTable,
       })) as AWS.DynamoDB.DocumentClient.QueryOutput;
       expect(response.Items).toEqual([{ Id: "001", Name: "名前" }]);
     });
@@ -252,7 +225,7 @@ describe("BaseModel.ts", () => {
         ExpressionAttributeNames: { "#key": "Id" },
         ExpressionAttributeValues: { ":value": "001" },
         KeyConditionExpression: "",
-        TableName: tableName,
+        TableName: testTable,
       })) as AWS.AWSError;
       expect(response.statusCode).toEqual(expect.any(Number));
       expect(response.message).toEqual(expect.any(String));

@@ -1,6 +1,6 @@
 import * as AWS from "aws-sdk";
 
-class BaseModel {
+class SamModel {
   protected documentClient: AWS.DynamoDB.DocumentClient;
 
   constructor(
@@ -10,7 +10,7 @@ class BaseModel {
     this.documentClient = new AWS.DynamoDB.DocumentClient(options);
   }
 
-  protected isAWSError(response: any): response is AWS.AWSError {
+  public isAWSError(response: any): response is AWS.AWSError {
     if (typeof response !== "object" || response == null) {
       return false;
     }
@@ -67,4 +67,4 @@ class BaseModel {
     }
   }
 }
-export default BaseModel;
+export default SamModel;
