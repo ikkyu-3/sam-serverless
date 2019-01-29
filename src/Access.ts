@@ -3,8 +3,7 @@ import LambdaResponse, { ILambdaResponse } from "./LambdaResponse";
 import SamModel from "./SamModel";
 
 export interface IAccessBody {
-  cardId: string;
-  purpose?: string;
+  purpose: string;
 }
 
 interface IRecord {
