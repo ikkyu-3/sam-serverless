@@ -115,6 +115,19 @@ export const userItemInput: AWS.DynamoDB.PutItemInput = {
   TableName: usersTable,
 };
 
+export const userItemInput2: AWS.DynamoDB.PutItemInput = {
+  Item: {
+    cardId: { S: "YYYYYYYYYYYYYYYY" },
+    createdAt: { S: "YYYY-MM-DDTHH:mm:ss.sss" },
+    name: { S: "name2" },
+    status: { BOOL: true },
+    userId: { S: "0000000002" },
+    version: { N: "0" },
+  },
+  ReturnConsumedCapacity: "TOTAL",
+  TableName: usersTable,
+};
+
 // Accesses Table
 export const accessesTable = "Accesses";
 
@@ -178,7 +191,7 @@ export const accessItemInput: AWS.DynamoDB.PutItemInput = {
           M: {
             entryTime: { S: "YYYY-MM-DDTHH:mm:ss.sssZ" },
             exitTime: { S: "YYYY-MM-DDTHH:mm:ss.sssZ" },
-            purpose: { S: "study" },
+            purpose: { S: "STUDY" },
           },
         },
       ],

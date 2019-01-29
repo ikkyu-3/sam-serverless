@@ -1,94 +1,25 @@
 /* tslint:disable no-console */
 import * as AWS from "aws-sdk";
 import Access, { IUser } from "../src/Access";
+import {
+  accessesTable,
+  accessItemInput,
+  createAccessesTableInput,
+  date,
+  endpoint,
+  region,
+} from "./testData";
 
-const tableName = "Accesses";
-process.env.ACCESSES_TABLE = "Accesses";
+process.env.ACCESSES_TABLE = accessesTable;
 
-const createTableInput: AWS.DynamoDB.CreateTableInput = {
-  AttributeDefinitions: [
-    {
-      AttributeName: "userId",
-      AttributeType: "S",
-    },
-    {
-      AttributeName: "date",
-      AttributeType: "S",
-    },
-  ],
-  KeySchema: [
-    {
-      AttributeName: "userId",
-      KeyType: "HASH",
-    },
-    {
-      AttributeName: "date",
-      KeyType: "RANGE",
-    },
-  ],
-  GlobalSecondaryIndexes: [
-    {
-      IndexName: "date-index" /* required */,
-      KeySchema: [
-        /* required */
-        {
-          AttributeName: "date" /* required */,
-          KeyType: "HASH" /* required */,
-        },
-        /* more items */
-      ],
-      Projection: {
-        /* required */
-        ProjectionType: "ALL",
-      },
-      ProvisionedThroughput: {
-        ReadCapacityUnits: 1,
-        WriteCapacityUnits: 1,
-      },
-    },
-  ],
-  ProvisionedThroughput: {
-    ReadCapacityUnits: 1,
-    WriteCapacityUnits: 1,
-  },
-  TableName: tableName,
-};
-
-const endpoint = "http://localhost:8000";
-const region = "ap-northeast-1";
 const dynamo = new AWS.DynamoDB({ endpoint, region });
 const access = new Access({ endpoint, region });
-const date = `${new Date().getFullYear()}${new Date().getMonth() +
-  1}${new Date().getDate()}`;
 
 describe("Access.ts", () => {
   beforeAll(async () => {
     try {
-      await dynamo.createTable(createTableInput).promise();
-      await dynamo
-        .putItem({
-          Item: {
-            userId: { S: "0000000001" },
-            date: { S: date },
-            name: { S: "name" },
-            records: {
-              L: [
-                {
-                  M: {
-                    entryTime: { S: "YYYY-MM-DDTHH:mm:ss.sssZ" },
-                    exitTime: { S: "YYYY-MM-DDTHH:mm:ss.sssZ" },
-                    purpose: { S: "study" },
-                  },
-                },
-              ],
-            },
-            createdAt: { S: "YYYY-MM-DDTHH:mm:ss.sss" },
-            version: { N: "0" },
-          },
-          ReturnConsumedCapacity: "TOTAL",
-          TableName: tableName,
-        })
-        .promise();
+      await dynamo.createTable(createAccessesTableInput).promise();
+      await dynamo.putItem(accessItemInput).promise();
     } catch (e) {
       console.error("初期化に失敗しました。", e);
     }
@@ -96,7 +27,7 @@ describe("Access.ts", () => {
 
   afterAll(async () => {
     try {
-      await dynamo.deleteTable({ TableName: tableName }).promise();
+      await dynamo.deleteTable({ TableName: accessesTable }).promise();
     } catch (e) {
       console.error("テーブル削除に失敗しました。", e);
     }
@@ -117,7 +48,7 @@ describe("Access.ts", () => {
       } = JSON.parse(response.body) as IUser;
       expect(userId).toBe("0000000001");
       expect(name).toBe("name");
-      expect(purpose).toBe("study");
+      expect(purpose).toBe("STUDY");
       expect(isEntry).toBeFalsy();
       expect(entryTime).toEqual(expect.any(String));
       expect(exitTime).toEqual(expect.any(String));
@@ -134,14 +65,14 @@ describe("Access.ts", () => {
       const response = await access.executeEntryProcess(
         "0000000002",
         "name2",
-        "study"
+        "STUDY"
       );
       expect(response.statusCode).toBe(200);
 
       // 検証
       const { Item } = await dynamo
         .getItem({
-          TableName: tableName,
+          TableName: accessesTable,
           Key: {
             userId: {
               S: "0000000002",
@@ -156,7 +87,7 @@ describe("Access.ts", () => {
       expect(Item!.name.S).toBe("name2");
       expect(Item!.createdAt.S).toEqual(expect.any(String));
       expect(Item!.records.L![0].M!.entryTime.S).toEqual(expect.any(String));
-      expect(Item!.records.L![0].M!.purpose.S).toBe("study");
+      expect(Item!.records.L![0].M!.purpose.S).toBe("STUDY");
       expect(Item!.records.L![0].M!.exitTime).toBeUndefined();
       expect(Item!.version.N).toBe("0");
     });
@@ -174,7 +105,7 @@ describe("Access.ts", () => {
                   M: {
                     entryTime: { S: "YYYY-MM-DDTHH:mm:ss.sssZ" },
                     exitTime: { S: "YYYY-MM-DDTHH:mm:ss.sssZ" },
-                    purpose: { S: "study" },
+                    purpose: { S: "STUDY" },
                   },
                 },
               ],
@@ -183,21 +114,21 @@ describe("Access.ts", () => {
             version: { N: "0" },
           },
           ReturnConsumedCapacity: "TOTAL",
-          TableName: tableName,
+          TableName: accessesTable,
         })
         .promise();
 
       const response = await access.executeEntryProcess(
         "0000000003",
         "name3",
-        "circle"
+        "CIRCLE"
       );
       expect(response.statusCode).toBe(200);
 
       // 検証
       const { Item } = await dynamo
         .getItem({
-          TableName: tableName,
+          TableName: accessesTable,
           Key: {
             userId: {
               S: "0000000003",
@@ -214,7 +145,7 @@ describe("Access.ts", () => {
       expect(Item!.updatedAt.S).toEqual(expect.any(String));
       expect(Item!.records.L!).toHaveLength(2);
       expect(Item!.records.L![1].M!.entryTime.S).toEqual(expect.any(String));
-      expect(Item!.records.L![1].M!.purpose.S).toBe("circle");
+      expect(Item!.records.L![1].M!.purpose.S).toBe("CIRCLE");
       expect(Item!.records.L![1].M!.exitTime).toBeUndefined();
       expect(Item!.version.N).toBe("1");
     });
@@ -233,7 +164,7 @@ describe("Access.ts", () => {
                 {
                   M: {
                     entryTime: { S: "YYYY-MM-DDTHH:mm:ss.sssZ" },
-                    purpose: { S: "study" },
+                    purpose: { S: "STUDY" },
                   },
                 },
               ],
@@ -242,7 +173,7 @@ describe("Access.ts", () => {
             version: { N: "0" },
           },
           ReturnConsumedCapacity: "TOTAL",
-          TableName: tableName,
+          TableName: accessesTable,
         })
         .promise();
 
@@ -252,7 +183,7 @@ describe("Access.ts", () => {
       // 検証
       const { Item } = await dynamo
         .getItem({
-          TableName: tableName,
+          TableName: accessesTable,
           Key: {
             userId: {
               S: "0000000004",
@@ -266,7 +197,7 @@ describe("Access.ts", () => {
 
       expect(Item!.updatedAt.S).toEqual(expect.any(String));
       expect(Item!.records.L![0].M!.entryTime.S).toEqual(expect.any(String));
-      expect(Item!.records.L![0].M!.purpose.S).toBe("study");
+      expect(Item!.records.L![0].M!.purpose.S).toBe("STUDY");
       expect(Item!.records.L![0].M!.exitTime.S).toEqual(expect.any(String));
       expect(Item!.version.N).toBe("1");
     });
@@ -282,7 +213,7 @@ describe("Access.ts", () => {
           {
             userId: "0000000001",
             name: "name",
-            purpose: "study",
+            purpose: "STUDY",
             isEntry: false,
             entryTime: "YYYY-MM-DDTHH:mm:ss.sssZ",
             exitTime: "YYYY-MM-DDTHH:mm:ss.sssZ",
