@@ -129,9 +129,9 @@ describe("Access.ts", () => {
     });
   });
 
-  describe("entryByUserId", () => {
+  describe("executeEntryProcess", () => {
     it("入室処理が行われる", async () => {
-      const response = await access.entryByUserId(
+      const response = await access.executeEntryProcess(
         "0000000002",
         "name2",
         "study"
@@ -187,7 +187,7 @@ describe("Access.ts", () => {
         })
         .promise();
 
-      const response = await access.entryByUserId(
+      const response = await access.executeEntryProcess(
         "0000000003",
         "name3",
         "circle"
@@ -220,7 +220,7 @@ describe("Access.ts", () => {
     });
   });
 
-  describe("exitByUserId", () => {
+  describe("executeExitProcess", () => {
     it("退室処理が行われる", async () => {
       await dynamo
         .putItem({
@@ -246,7 +246,7 @@ describe("Access.ts", () => {
         })
         .promise();
 
-      const response = await access.exitByUserId("0000000004");
+      const response = await access.executeExitProcess("0000000004");
       expect(response.statusCode).toBe(200);
 
       // 検証

@@ -1,6 +1,6 @@
 import * as AWS from "aws-sdk";
-import BaseModel from "./BaseModel";
 import LambdaResponse, { ILambdaResponse } from "./LambdaResponse";
+import SamModel from "./SamModel";
 
 export interface IAccessBody {
   cardId: string;
@@ -32,7 +32,7 @@ export interface IUser {
   exitTime?: string;
 }
 
-class Access extends BaseModel {
+class Access extends SamModel {
   private readonly ACCESSES_TABLE = process.env.ACCESSES_TABLE || "";
 
   public async getUserToday(userId: string): Promise<ILambdaResponse> {
@@ -43,7 +43,7 @@ class Access extends BaseModel {
     }
 
     if (!response) {
-      return LambdaResponse.notFound();
+      return LambdaResponse.notFound({ message: "Not Found", exists: true });
     }
 
     const record = response.records[response.records.length - 1];
@@ -59,7 +59,7 @@ class Access extends BaseModel {
     return LambdaResponse.ok(user);
   }
 
-  public async entryByUserId(
+  public async executeEntryProcess(
     userId: string,
     name: string,
     purpose: string
@@ -130,7 +130,7 @@ class Access extends BaseModel {
     }
   }
 
-  public async exitByUserId(userId: string): Promise<ILambdaResponse> {
+  public async executeExitProcess(userId: string): Promise<ILambdaResponse> {
     const accessItem = await this.findByUserId(userId);
     if (this.isAWSError(accessItem)) {
       return LambdaResponse.awsError(accessItem);

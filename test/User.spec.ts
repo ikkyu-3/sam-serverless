@@ -1,53 +1,24 @@
 /* tslint:disable no-console */
 import * as AWS from "aws-sdk";
 import User, { IUserItem } from "../src/User";
+import {
+  createUsersTableInput,
+  endpoint,
+  region,
+  userItemInput,
+  usersTable,
+} from "./testData";
 
-const tableName = "Users";
-process.env.USERS_TABLE = "Users";
+process.env.USERS_TABLE = usersTable;
 
-const createTableInput: AWS.DynamoDB.CreateTableInput = {
-  AttributeDefinitions: [
-    {
-      AttributeName: "cardId",
-      AttributeType: "S",
-    },
-  ],
-  KeySchema: [
-    {
-      AttributeName: "cardId",
-      KeyType: "HASH",
-    },
-  ],
-  ProvisionedThroughput: {
-    ReadCapacityUnits: 1,
-    WriteCapacityUnits: 1,
-  },
-  TableName: tableName,
-};
-
-const endpoint = "http://localhost:8000";
-const region = "ap-northeast-1";
 const dynamo = new AWS.DynamoDB({ endpoint, region });
 const user = new User({ endpoint, region });
 
-describe("BaseModel.ts", () => {
+describe("User.ts", () => {
   beforeAll(async () => {
     try {
-      await dynamo.createTable(createTableInput).promise();
-      await dynamo
-        .putItem({
-          Item: {
-            cardId: { S: "xxxxxxxxxxxxxxxx" },
-            createdAt: { S: "YYYY-MM-DDTHH:mm:ss.sss" },
-            name: { S: "name" },
-            status: { BOOL: true },
-            userId: { S: "0000000001" },
-            version: { N: "0" },
-          },
-          ReturnConsumedCapacity: "TOTAL",
-          TableName: tableName,
-        })
-        .promise();
+      await dynamo.createTable(createUsersTableInput).promise();
+      await dynamo.putItem(userItemInput).promise();
     } catch (e) {
       console.error("初期化に失敗しました。", e);
     }
@@ -55,7 +26,7 @@ describe("BaseModel.ts", () => {
 
   afterAll(async () => {
     try {
-      await dynamo.deleteTable({ TableName: tableName }).promise();
+      await dynamo.deleteTable({ TableName: usersTable }).promise();
     } catch (e) {
       console.error("テーブル削除に失敗しました。", e);
     }
@@ -64,7 +35,7 @@ describe("BaseModel.ts", () => {
   describe("findByCardId", () => {
     it("cardIdに該当する項目を取得できる", async () => {
       const response = (await user.findByCardId(
-        "xxxxxxxxxxxxxxxx"
+        "XXXXXXXXXXXXXXXX"
       )) as IUserItem;
       expect(response.userId).toBe("0000000001");
       expect(response.name).toBe("name");
@@ -74,7 +45,7 @@ describe("BaseModel.ts", () => {
     });
 
     it("cardIdに該当しない場合はundefinedを返す", async () => {
-      const response = await user.findByCardId("yyyyyyyyyyyyyyyy");
+      const response = await user.findByCardId("YYYYYYYYYYYYYYYY");
       expect(response).toBeUndefined();
     });
   });
@@ -82,7 +53,7 @@ describe("BaseModel.ts", () => {
   describe("save", () => {
     it("新規に項目ができる", async () => {
       const response = await user.save({
-        cardId: "zzzzzzzzzzzzzzzz",
+        cardId: "ZZZZZZZZZZZZZZZZ",
         name: "name2",
         userId: "0000000002",
       });
@@ -91,8 +62,8 @@ describe("BaseModel.ts", () => {
       // 検証
       const newUser = (await dynamo
         .getItem({
-          Key: { cardId: { S: "zzzzzzzzzzzzzzzz" } },
-          TableName: tableName,
+          Key: { cardId: { S: "ZZZZZZZZZZZZZZZZ" } },
+          TableName: usersTable,
         })
         .promise()) as AWS.DynamoDB.GetItemOutput;
       expect(newUser.Item!.userId.S).toBe("0000000002");
@@ -105,7 +76,7 @@ describe("BaseModel.ts", () => {
 
     it("既に登録されている場合は、nameが更新される", async () => {
       const response = await user.save({
-        cardId: "zzzzzzzzzzzzzzzz",
+        cardId: "ZZZZZZZZZZZZZZZZ",
         name: "名前2",
         userId: "0000000002",
       });
@@ -114,8 +85,8 @@ describe("BaseModel.ts", () => {
       // 検証
       const newUser = (await dynamo
         .getItem({
-          Key: { cardId: { S: "zzzzzzzzzzzzzzzz" } },
-          TableName: tableName,
+          Key: { cardId: { S: "ZZZZZZZZZZZZZZZZ" } },
+          TableName: usersTable,
         })
         .promise()) as AWS.DynamoDB.GetItemOutput;
       expect(newUser.Item!.name.S).toBe("名前2");
@@ -125,7 +96,7 @@ describe("BaseModel.ts", () => {
 
     it("userIdが違う場合は、400を返す", async () => {
       const response = await user.save({
-        cardId: "zzzzzzzzzzzzzzzz",
+        cardId: "ZZZZZZZZZZZZZZZZ",
         name: "名前2",
         userId: "9999999999",
       });

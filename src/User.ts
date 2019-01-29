@@ -1,6 +1,6 @@
 import * as AWS from "aws-sdk";
-import BaseModel from "./BaseModel";
 import LambdaResponse, { ILambdaResponse } from "./LambdaResponse";
+import SamModel from "./SamModel";
 import { IUserSaveBody } from "./Validation";
 
 export interface IUserItem {
@@ -13,7 +13,7 @@ export interface IUserItem {
   version: number;
 }
 
-class User extends BaseModel {
+class User extends SamModel {
   private readonly USERS_TABLE = process.env.USERS_TABLE || "";
 
   public async findByCardId(

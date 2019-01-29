@@ -11,7 +11,9 @@ export interface IUserEnterBody {
 }
 
 class Validation {
-  public static validateRequestBodyForSaving(body: string | null): boolean {
+  public static validateRequestBodyForSaving(
+    body: string | null
+  ): body is string {
     if (!isString(body)) {
       return false;
     }
@@ -37,7 +39,9 @@ class Validation {
     return true;
   }
 
-  public static validateRequestBodyForEntering(body: string | null): boolean {
+  public static validateRequestBodyForEntering(
+    body: string | null
+  ): body is string {
     if (!isString(body)) {
       return false;
     }
@@ -55,12 +59,14 @@ class Validation {
     return true;
   }
 
-  public static validateCardId(cardId: string | null): boolean {
-    if (!cardId) {
+  public static validateCardId(
+    pathParameters: { [name: string]: string } | null
+  ): pathParameters is { [name: string]: string } {
+    if (!pathParameters) {
       return false;
     }
 
-    if (!Validation.cardIdRegExp.test(cardId)) {
+    if (!Validation.cardIdRegExp.test(pathParameters.cardId)) {
       return false;
     }
 

@@ -86,12 +86,14 @@ describe("Validation.ts", () => {
 
   describe("validateCardId", () => {
     it("引数の文字列が正しい場合、trueを返す", () => {
-      expect(Validation.validateCardId("XXXXXXXXXXXXXXXX")).toBeTruthy();
+      expect(
+        Validation.validateCardId({ cardId: "XXXXXXXXXXXXXXXX" })
+      ).toBeTruthy();
     });
 
     it("引数の文字列が正しくない場合、falseを返す", () => {
-      expect(Validation.validateCardId("aaaaaaaaaa")).toBeFalsy();
-      expect(Validation.validateCardId("")).toBeFalsy();
+      expect(Validation.validateCardId({ cardId: "aaaaaaaaaa" })).toBeFalsy();
+      expect(Validation.validateCardId({ cardId: "" })).toBeFalsy();
     });
 
     it("引数がnullの場合、falseを返す", () => {
