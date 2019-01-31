@@ -104,7 +104,7 @@ export const createUsersTableInput: AWS.DynamoDB.CreateTableInput = {
 
 export const userItemInput: AWS.DynamoDB.PutItemInput = {
   Item: {
-    cardId: { S: "XXXXXXXXXXXXXXXX" },
+    cardId: { S: "WWWWWWWWWWWWWWWW" },
     createdAt: { S: "YYYY-MM-DDTHH:mm:ss.sss" },
     name: { S: "name" },
     status: { BOOL: true },
@@ -117,11 +117,37 @@ export const userItemInput: AWS.DynamoDB.PutItemInput = {
 
 export const userItemInput2: AWS.DynamoDB.PutItemInput = {
   Item: {
-    cardId: { S: "YYYYYYYYYYYYYYYY" },
+    cardId: { S: "XXXXXXXXXXXXXXXX" },
     createdAt: { S: "YYYY-MM-DDTHH:mm:ss.sss" },
     name: { S: "name2" },
     status: { BOOL: true },
     userId: { S: "0000000002" },
+    version: { N: "0" },
+  },
+  ReturnConsumedCapacity: "TOTAL",
+  TableName: usersTable,
+};
+
+export const userItemInput3: AWS.DynamoDB.PutItemInput = {
+  Item: {
+    cardId: { S: "YYYYYYYYYYYYYYYY" },
+    createdAt: { S: "YYYY-MM-DDTHH:mm:ss.sss" },
+    name: { S: "name3" },
+    status: { BOOL: true },
+    userId: { S: "0000000003" },
+    version: { N: "0" },
+  },
+  ReturnConsumedCapacity: "TOTAL",
+  TableName: usersTable,
+};
+
+export const userItemInput4: AWS.DynamoDB.PutItemInput = {
+  Item: {
+    cardId: { S: "ZZZZZZZZZZZZZZZZ" },
+    createdAt: { S: "YYYY-MM-DDTHH:mm:ss.sss" },
+    name: { S: "name4" },
+    status: { BOOL: true },
+    userId: { S: "0000000004" },
     version: { N: "0" },
   },
   ReturnConsumedCapacity: "TOTAL",
@@ -192,6 +218,28 @@ export const accessItemInput: AWS.DynamoDB.PutItemInput = {
             entryTime: { S: "YYYY-MM-DDTHH:mm:ss.sssZ" },
             exitTime: { S: "YYYY-MM-DDTHH:mm:ss.sssZ" },
             purpose: { S: "STUDY" },
+          },
+        },
+      ],
+    },
+    createdAt: { S: "YYYY-MM-DDTHH:mm:ss.sss" },
+    version: { N: "0" },
+  },
+  ReturnConsumedCapacity: "TOTAL",
+  TableName: accessesTable,
+};
+
+export const accessItemInput2: AWS.DynamoDB.PutItemInput = {
+  Item: {
+    userId: { S: "0000000004" },
+    date: { S: date },
+    name: { S: "name4" },
+    records: {
+      L: [
+        {
+          M: {
+            entryTime: { S: "YYYY-MM-DDTHH:mm:ss.sssZ" },
+            purpose: { S: "MEET_UP" },
           },
         },
       ],
