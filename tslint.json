@@ -15,5 +15,10 @@
         }
       ]
     },
-    "rulesDirectory": ["tslint-plugin-prettier"]
+    "rulesDirectory": ["tslint-plugin-prettier"],
+    "linterOptions": {
+      "exclude": [
+        "severless"
+      ]
+    }
 }
