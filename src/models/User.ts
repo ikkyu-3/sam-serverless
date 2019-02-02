@@ -1,7 +1,7 @@
 import * as AWS from "aws-sdk";
-import LambdaResponse, { ILambdaResponse } from "./LambdaResponse";
+import LambdaResponse, { ILambdaResponse } from "../lib/LambdaResponse";
+import { IUserSaveBody } from "../lib/Validation";
 import SamModel from "./SamModel";
-import { IUserSaveBody } from "./Validation";
 
 export interface IUserItem {
   cardId: string;

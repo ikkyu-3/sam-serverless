@@ -1,5 +1,5 @@
 import * as AWS from "aws-sdk";
-import LambdaResponse, { ILambdaResponse } from "./LambdaResponse";
+import LambdaResponse, { ILambdaResponse } from "../lib/LambdaResponse";
 import SamModel from "./SamModel";
 
 export interface IAccessBody {

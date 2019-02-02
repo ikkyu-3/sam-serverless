@@ -1,8 +1,8 @@
 import { APIGatewayProxyEvent } from "aws-lambda";
-import Access from "./Access";
-import LambdaResponse from "./LambdaResponse";
-import User from "./User";
-import Validation, { IUserEnterBody, IUserSaveBody } from "./Validation";
+import LambdaResponse from "./lib/LambdaResponse";
+import Validation, { IUserEnterBody, IUserSaveBody } from "./lib/Validation";
+import Access from "./models/Access";
+import User from "./models/User";
 
 // Setting Time Zone
 process.env.TZ = "Asia/Tokyo";

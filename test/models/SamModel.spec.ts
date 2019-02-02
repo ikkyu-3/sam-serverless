@@ -1,13 +1,13 @@
 /* tslint:disable no-console */
 import * as AWS from "aws-sdk";
-import SamModel from "../src/SamModel";
+import SamModel from "../../src/models/SamModel";
 import {
   createTestTableInput,
   endpoint,
   region,
   testItemInput,
   testTable,
-} from "./testData";
+} from "../testData";
 
 class TestModel extends SamModel {
   constructor(

@@ -1,6 +1,6 @@
 /* tslint:disable no-console */
 import * as AWS from "aws-sdk";
-import Access, { IUser } from "../src/Access";
+import Access, { IUser } from "../../src/models/Access";
 import {
   accessesTable,
   accessItemInput,
@@ -8,7 +8,7 @@ import {
   date,
   endpoint,
   region,
-} from "./testData";
+} from "../testData";
 
 process.env.ACCESSES_TABLE = accessesTable;
 

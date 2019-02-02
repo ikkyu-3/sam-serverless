@@ -1,13 +1,13 @@
 /* tslint:disable no-console */
 import * as AWS from "aws-sdk";
-import User, { IUserItem } from "../src/User";
+import User, { IUserItem } from "../../src/models/User";
 import {
   createUsersTableInput,
   endpoint,
   region,
   userItemInput,
   usersTable,
-} from "./testData";
+} from "../testData";
 
 process.env.USERS_TABLE = usersTable;
 
@@ -35,7 +35,7 @@ describe("User.ts", () => {
   describe("findByCardId", () => {
     it("cardIdに該当する項目を取得できる", async () => {
       const response = (await user.findByCardId(
-        "XXXXXXXXXXXXXXXX"
+        "WWWWWWWWWWWWWWWW"
       )) as IUserItem;
       expect(response.userId).toBe("0000000001");
       expect(response.name).toBe("name");

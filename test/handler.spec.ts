@@ -1,8 +1,8 @@
 /* tslint:disable no-console */
 import * as AWS from "aws-sdk";
-import { IAccessBody, IUser } from "../src/Access";
-import { ILambdaResponse } from "../src/LambdaResponse";
-import { IUserSaveBody } from "../src/Validation";
+import { ILambdaResponse } from "../src/lib/LambdaResponse";
+import { IUserSaveBody } from "../src/lib/Validation";
+import { IAccessBody, IUser } from "../src/models/Access";
 import {
   accessesTable,
   accessItemInput,
