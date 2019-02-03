@@ -10,6 +10,7 @@ provider:
   region: ${opt:region, "ap-northeast-1"}
   profile: ${opt:profile, "default"}
   stage: ${opt:stage, "dev"}
+  apiStage: ${opt:apiStage, "master"}
   memorySize: 512 # optional, in MB, default is 1024
   timeout: 10 # optional, in seconds, default is 6
   versionFunctions: false # optional, default is true
@@ -27,85 +28,41 @@ provider:
         - dynamodb:PutItem
         - dynamodb:UpdateItem
         - dynamodb:DeleteItem
-      Resource: "arn:aws:dynamodb:ap-northeast-1:*:*"
+      Resource: "arn:aws:dynamodb:${self:provider.region}:*:*"
 
 functions:
-  putUser:
+  PutUser:
     handler: handler.putUser
     name: sam-server-putUser-${self:provider.stage}
 
-  getUserStatus:
+  GetUserStatus:
     handler: handler.getUserStatus
     name: sam-server-getUserStatus-${self:provider.stage}
 
-  putUserEntry:
+  PutUserEntry:
     handler: handler.putUserEntry
     name: sam-server-putUserEntry-${self:provider.stage}
 
-  putUserExit:
+  PutUserExit:
     handler: handler.putUserExit
     name: sam-server-putUserExit-${self:provider.stage}
 
-  getUsers:
+  GetUsers:
     handler: handler.getUsers
     name: sam-server-getUsers-${self:provider.stage}
 
 # you can add CloudFormation resource templates here
 resources:
- Resources:
-  UsersTable:
-    Type: AWS::DynamoDB::Table
-    Properties:
-      TableName: Users
-      AttributeDefinitions:
-        -
-          AttributeName: cardId
-          AttributeType: S
-      KeySchema:
-        -
-          AttributeName: cardId
-          KeyType: HASH
-      ProvisionedThroughput:
-        ReadCapacityUnits: 1
-        WriteCapacityUnits: 1
-
-  AccessesTable:
-    Type: AWS::DynamoDB::Table
-    Properties:
-      TableName: Accesses
-      AttributeDefinitions:
-        -
-          AttributeName: userId
-          AttributeType: S
-        -
-          AttributeName: date
-          AttributeType: S
-      KeySchema:
-        -
-          AttributeName: userId
-          KeyType: HASH
-        -
-          AttributeName: date
-          KeyType: RANGE
-      GlobalSecondaryIndexes:
-        -
-          IndexName: date-index
-          KeySchema:
-            -
-              AttributeName: date
-              KeyType: HASH
-          Projection:
-            ProjectionType: ALL
-          ProvisionedThroughput:
-            ReadCapacityUnits: 1
-            WriteCapacityUnits: 1
-      ProvisionedThroughput:
-        ReadCapacityUnits: 1
-        WriteCapacityUnits: 1
-
+  - ${file(./resources/SamserverlessApi.yml)}
+  - ${file(./resources/SamServerlessApiDeployment.yml)}
+  - ${file(./resources/PutUserPermission.yml)}
+  - ${file(./resources/GetUserStatusPermission.yml)}
+  - ${file(./resources/PutUserEntryPermission.yml)}
+  - ${file(./resources/PutUserExitPermission.yml)}
+  - ${file(./resources/GetUsersPermission.yml)}
+  - ${file(./resources/UsersTable.yml)}
+  - ${file(./resources/AccessesTable.yml)}
 
 package:
-#  include:
-#    - include-me.js
-exclude:
-  - resources/**
+  exclude:
+    - resources/**

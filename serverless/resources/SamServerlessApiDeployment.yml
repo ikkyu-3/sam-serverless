@@ -1,0 +1,7 @@
+Resources:
+  SamServerlessApiDeployment:
+    Type: AWS::ApiGateway::Deployment
+    Properties:
+      RestApiId: !Ref SamServerlessApi
+      StageName: ${self:provider.apiStage}
+    DependsOn: SamServerlessApi

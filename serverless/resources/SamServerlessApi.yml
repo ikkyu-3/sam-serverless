@@ -1,0 +1,12 @@
+Resources:
+  SamServerlessApi:
+    Type: AWS::ApiGateway::RestApi
+    Properties:
+      Name: sam-serverless-restApi-${self:provider.stage}
+      Body: ${file(./resources/swagger.yml)}
+    DependsOn:
+     - PutUserLambdaFunction
+     - GetUserStatusLambdaFunction
+     - PutUserEntryLambdaFunction
+     - PutUserExitLambdaFunction
+     - GetUsersLambdaFunction
