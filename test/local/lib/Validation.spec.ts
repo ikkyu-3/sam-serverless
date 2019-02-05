@@ -1,4 +1,4 @@
-import Validation from "../../src/lib/Validation";
+import Validation from "../../../src/lib/Validation";
 
 describe("Validation.ts", () => {
   describe("validateRequestBodyForSaving", () => {

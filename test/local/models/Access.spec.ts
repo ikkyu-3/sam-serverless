@@ -1,6 +1,6 @@
 /* tslint:disable no-console */
 import * as AWS from "aws-sdk";
-import Access, { IUser } from "../../src/models/Access";
+import Access, { IUser } from "../../../src/models/Access";
 import {
   accessesTable,
   accessItemInput,
@@ -8,7 +8,7 @@ import {
   date,
   endpoint,
   region,
-} from "../testData";
+} from "../../testData";
 
 process.env.ACCESSES_TABLE = accessesTable;
 
@@ -123,6 +123,7 @@ describe("Access.ts", () => {
         "name3",
         "CIRCLE"
       );
+
       expect(response.statusCode).toBe(200);
 
       // 検証

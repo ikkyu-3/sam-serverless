@@ -1,13 +1,13 @@
 /* tslint:disable no-console */
 import * as AWS from "aws-sdk";
-import User, { IUserItem } from "../../src/models/User";
+import User, { IUserItem } from "../../../src/models/User";
 import {
   createUsersTableInput,
   endpoint,
   region,
   userItemInput,
   usersTable,
-} from "../testData";
+} from "../../testData";
 
 process.env.USERS_TABLE = usersTable;
 

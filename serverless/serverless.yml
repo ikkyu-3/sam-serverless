@@ -18,6 +18,7 @@ provider:
     USERS_TABLE: ${self:custom.usersTable}
     ACCESSES_TABLE: ${self:custom.accessesTable}
     REGION: ${self:provider.region}
+    TZ: Asia/Tokyo
   iamRoleStatements: # permissions for all of your functions can be set here
     - Effect: Allow
       Action: # Gives permission to DynamoDB tables in a specific region

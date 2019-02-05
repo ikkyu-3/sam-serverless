@@ -3,8 +3,7 @@ import * as AWS from "aws-sdk";
 
 export const endpoint = "http://localhost:8000";
 export const region = "ap-northeast-1";
-export const date = `${new Date().getFullYear()}${new Date().getMonth() +
-  1}${new Date().getDate()}`;
+export const date = new Date().toLocaleDateString();
 
 export const apiGatewayEvent: APIGatewayProxyEvent = {
   body: null, // string | null;

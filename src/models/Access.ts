@@ -69,22 +69,21 @@ class Access extends SamModel {
       return LambdaResponse.awsError(accessItem);
     }
 
-    const now = new Date().toISOString();
-    const date = this.createTodayString();
+    const date = new Date();
 
     if (typeof accessItem === "undefined") {
       // 新規追加 createItem
       const item: IAccessItem = {
         userId,
-        date,
+        date: date.toLocaleDateString(),
         name,
         records: [
           {
-            entryTime: now,
+            entryTime: date.toLocaleString(),
             purpose,
           },
         ],
-        createdAt: now,
+        createdAt: date.toLocaleString(),
         version: 0,
       };
 
@@ -100,10 +99,10 @@ class Access extends SamModel {
       return LambdaResponse.ok();
     } else {
       // 更新 updateItem
-      const record = { entryTime: now, purpose };
+      const record = { entryTime: date.toLocaleString(), purpose };
       const response = await this.update({
         TableName: this.ACCESSES_TABLE,
-        Key: { userId, date },
+        Key: { userId, date: date.toLocaleDateString() },
         UpdateExpression:
           "set #r = list_append(:r, :i), #u = :u, #v = :newVersion",
         ConditionExpression: "#v = :v",
@@ -115,7 +114,7 @@ class Access extends SamModel {
         ExpressionAttributeValues: {
           ":r": accessItem.records,
           ":i": [record],
-          ":u": now,
+          ":u": date.toLocaleString(),
           ":v": accessItem.version,
           ":newVersion": accessItem.version + 1,
         },
@@ -139,15 +138,14 @@ class Access extends SamModel {
       return LambdaResponse.badRequest();
     }
 
-    const now = new Date().toISOString();
-    const date = this.createTodayString();
+    const date = new Date();
 
     const currentRcord = accessItem.records[accessItem.records.length - 1];
-    currentRcord.exitTime = now;
+    currentRcord.exitTime = date.toLocaleString();
 
     const response = await this.update({
       TableName: this.ACCESSES_TABLE,
-      Key: { userId, date },
+      Key: { userId, date: date.toLocaleDateString() },
       UpdateExpression: "set #r = :r, #u = :u, #v = :newVersion",
       ConditionExpression: "#v = :v",
       ExpressionAttributeNames: {
@@ -157,7 +155,7 @@ class Access extends SamModel {
       },
       ExpressionAttributeValues: {
         ":r": accessItem.records,
-        ":u": now,
+        ":u": date.toLocaleString(),
         ":v": accessItem.version,
         ":newVersion": accessItem.version + 1,
       },
@@ -176,7 +174,7 @@ class Access extends SamModel {
       IndexName: "date-index",
       KeyConditionExpression: "#d = :d",
       ExpressionAttributeNames: { "#d": "date" },
-      ExpressionAttributeValues: { ":d": this.createTodayString() },
+      ExpressionAttributeValues: { ":d": new Date().toLocaleDateString() },
     });
 
     if (this.isAWSError(response)) {
@@ -204,10 +202,10 @@ class Access extends SamModel {
   private async findByUserId(
     userId: string
   ): Promise<IAccessItem | undefined | AWS.AWSError> {
-    const date = this.createTodayString();
+    const date = new Date();
 
     const response = await this.get({
-      Key: { userId, date },
+      Key: { userId, date: date.toLocaleDateString() },
       TableName: this.ACCESSES_TABLE,
     });
 
@@ -216,11 +214,6 @@ class Access extends SamModel {
     }
 
     return response.Item as IAccessItem;
-  }
-
-  private createTodayString(): string {
-    const date = new Date();
-    return `${date.getFullYear()}${date.getMonth() + 1}${date.getDate()}`;
   }
 }
 export default Access;

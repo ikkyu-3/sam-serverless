@@ -18,7 +18,8 @@
     "rulesDirectory": ["tslint-plugin-prettier"],
     "linterOptions": {
       "exclude": [
-        "severless"
+        "severless",
+        "**/*.js"
       ]
     }
 }

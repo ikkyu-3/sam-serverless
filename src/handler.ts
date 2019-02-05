@@ -4,8 +4,6 @@ import Validation, { IUserEnterBody, IUserSaveBody } from "./lib/Validation";
 import Access from "./models/Access";
 import User from "./models/User";
 
-// Setting Time Zone
-process.env.TZ = "Asia/Tokyo";
 const options = {
   region: process.env.REGION,
   endpoint: process.env.END_POINT,

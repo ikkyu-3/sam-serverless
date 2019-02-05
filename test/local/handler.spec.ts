@@ -1,8 +1,8 @@
 /* tslint:disable no-console */
 import * as AWS from "aws-sdk";
-import { ILambdaResponse } from "../src/lib/LambdaResponse";
-import { IUserSaveBody } from "../src/lib/Validation";
-import { IAccessBody, IUser } from "../src/models/Access";
+import { ILambdaResponse } from "../../src/lib/LambdaResponse";
+import { IUserSaveBody } from "../../src/lib/Validation";
+import { IAccessBody, IUser } from "../../src/models/Access";
 import {
   accessesTable,
   accessItemInput,
@@ -18,7 +18,7 @@ import {
   userItemInput3,
   userItemInput4,
   usersTable,
-} from "./testData";
+} from "../testData";
 
 process.env.ACCESSES_TABLE = accessesTable;
 process.env.USERS_TABLE = usersTable;
@@ -31,7 +31,7 @@ import {
   putUser,
   putUserEntry,
   putUserExit,
-} from "../src/handler";
+} from "../../src/handler";
 
 const dynamo = new AWS.DynamoDB({ endpoint, region });
 

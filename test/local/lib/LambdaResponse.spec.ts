@@ -1,4 +1,4 @@
-import LambdaResponse from "../../src/lib/LambdaResponse";
+import LambdaResponse from "../../../src/lib/LambdaResponse";
 
 const baseResponse = {
   headers: {
