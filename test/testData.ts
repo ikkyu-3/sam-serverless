@@ -20,6 +20,11 @@ export const apiGatewayEvent: APIGatewayProxyEvent = {
     accountId: "", // string;
     apiId: "", // string;
     authorizer: null, // AuthResponseContext | null;
+    connectedAt: 0, // number;
+    connectionId: "", // string;
+    domainName: "", // string;
+    eventType: "", // string;
+    extendedRequestId: "", // string;
     httpMethod: "", // string;
     identity: {
       accessKey: null, // string | null;
@@ -36,12 +41,16 @@ export const apiGatewayEvent: APIGatewayProxyEvent = {
       userAgent: null, // string | null;
       userArn: null, // string | null;
     },
+    messageDirection: "", // string;
+    messageId: null, // string | null;
     path: "", // string;
     stage: "", // string;
     requestId: "", // string;
+    requestTime: "", // string;
     requestTimeEpoch: 0, // number;
     resourceId: "", // string;
     resourcePath: "", // string;
+    routeKey: "", // string;
   }, // APIGatewayEventRequestContext;
   resource: "", // string;
 };
@@ -71,7 +80,7 @@ export const createTestTableInput: AWS.DynamoDB.CreateTableInput = {
 
 export const testItemInput: AWS.DynamoDB.PutItemInput = {
   Item: {
-    Id: { S: "001" },
+    Id: { S: "0000000001" },
     Name: { S: "名前" },
   },
   ReturnConsumedCapacity: "TOTAL",
@@ -103,7 +112,7 @@ export const createUsersTableInput: AWS.DynamoDB.CreateTableInput = {
 
 export const userItemInput: AWS.DynamoDB.PutItemInput = {
   Item: {
-    cardId: { S: "WWWWWWWWWWWWWWWW" },
+    cardId: { S: "wwwwwwwwwwwwwwww" },
     createdAt: { S: "YYYY-MM-DDTHH:mm:ss.sss" },
     name: { S: "name" },
     status: { BOOL: true },
@@ -116,7 +125,7 @@ export const userItemInput: AWS.DynamoDB.PutItemInput = {
 
 export const userItemInput2: AWS.DynamoDB.PutItemInput = {
   Item: {
-    cardId: { S: "XXXXXXXXXXXXXXXX" },
+    cardId: { S: "xxxxxxxxxxxxxxxx" },
     createdAt: { S: "YYYY-MM-DDTHH:mm:ss.sss" },
     name: { S: "name2" },
     status: { BOOL: true },
@@ -129,7 +138,7 @@ export const userItemInput2: AWS.DynamoDB.PutItemInput = {
 
 export const userItemInput3: AWS.DynamoDB.PutItemInput = {
   Item: {
-    cardId: { S: "YYYYYYYYYYYYYYYY" },
+    cardId: { S: "yyyyyyyyyyyyyyyy" },
     createdAt: { S: "YYYY-MM-DDTHH:mm:ss.sss" },
     name: { S: "name3" },
     status: { BOOL: true },
@@ -142,7 +151,7 @@ export const userItemInput3: AWS.DynamoDB.PutItemInput = {
 
 export const userItemInput4: AWS.DynamoDB.PutItemInput = {
   Item: {
-    cardId: { S: "ZZZZZZZZZZZZZZZZ" },
+    cardId: { S: "zzzzzzzzzzzzzzzz" },
     createdAt: { S: "YYYY-MM-DDTHH:mm:ss.sss" },
     name: { S: "name4" },
     status: { BOOL: true },
