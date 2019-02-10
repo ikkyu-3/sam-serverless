@@ -65,7 +65,7 @@ describe("handler.ts", () => {
       const saveBody: IUserSaveBody = {
         userId: "",
         name: "name5",
-        cardId: "VVVVVVVVVVVVVVVV",
+        cardId: "vvvvvvvvvvvvvvvv",
       };
       const event = { ...apiGatewayEvent, body: JSON.stringify(saveBody) };
       const response = await putUser(event);
@@ -76,7 +76,7 @@ describe("handler.ts", () => {
       const saveBody: IUserSaveBody = {
         userId: "0000000005",
         name: "name5",
-        cardId: "VVVVVVVVVVVVVVVV",
+        cardId: "vvvvvvvvvvvvvvvv",
       };
       const event = { ...apiGatewayEvent, body: JSON.stringify(saveBody) };
       const response = await putUser(event);
@@ -88,7 +88,7 @@ describe("handler.ts", () => {
           TableName: usersTable,
           Key: {
             cardId: {
-              S: "VVVVVVVVVVVVVVVV",
+              S: "vvvvvvvvvvvvvvvv",
             },
           },
         })
@@ -108,7 +108,7 @@ describe("handler.ts", () => {
       const event = {
         ...apiGatewayEvent,
         pathParameters: {
-          cardId: "WWWWWWWWWWWWWWWW",
+          cardId: "wwwwwwwwwwwwwwww",
         },
       };
 
@@ -136,7 +136,7 @@ describe("handler.ts", () => {
       const event = {
         ...apiGatewayEvent,
         pathParameters: {
-          cardId: "XXXXXXXXXXXXXXXX",
+          cardId: "xxxxxxxxxxxxxxxx",
         },
       };
 
@@ -162,7 +162,7 @@ describe("handler.ts", () => {
       const event = {
         ...apiGatewayEvent,
         pathParameters: {
-          cardId: "AAAAAAAAAAAAAAAA",
+          cardId: "aaaaaaaaaaaaaaaa",
         },
       };
 
@@ -191,7 +191,7 @@ describe("handler.ts", () => {
       const event = {
         ...apiGatewayEvent,
         pathParameters: {
-          cardId: "YYYYYYYYYYYYYYYY",
+          cardId: "yyyyyyyyyyyyyyyy",
         },
         body: JSON.stringify({}),
       };
@@ -204,7 +204,7 @@ describe("handler.ts", () => {
       const event = {
         ...apiGatewayEvent,
         pathParameters: {
-          cardId: "AAAAAAAAAAAAAAAA",
+          cardId: "aaaaaaaaaaaaaaaa",
         },
         body: JSON.stringify(accessBody),
       };
@@ -219,7 +219,7 @@ describe("handler.ts", () => {
       const event = {
         ...apiGatewayEvent,
         pathParameters: {
-          cardId: "YYYYYYYYYYYYYYYY",
+          cardId: "yyyyyyyyyyyyyyyy",
         },
         body: JSON.stringify(accessBody),
       };
@@ -267,7 +267,7 @@ describe("handler.ts", () => {
       const event = {
         ...apiGatewayEvent,
         pathParameters: {
-          cardId: "AAAAAAAAAAAAAAAA",
+          cardId: "aaaaaaaaaaaaaaaa",
         },
       };
       const response = (await putUserExit(event)) as ILambdaResponse;
@@ -280,7 +280,7 @@ describe("handler.ts", () => {
       const event = {
         ...apiGatewayEvent,
         pathParameters: {
-          cardId: "ZZZZZZZZZZZZZZZZ",
+          cardId: "zzzzzzzzzzzzzzzz",
         },
       };
       const response = (await putUserExit(event)) as ILambdaResponse;

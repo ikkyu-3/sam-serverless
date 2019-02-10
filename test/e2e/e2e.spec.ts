@@ -13,9 +13,9 @@ const documentClient = new AWS.DynamoDB.DocumentClient({
   region: process.env.REGION!,
 });
 
-const userId = "0000000000";
+const userId = "00000000000";
 const name = "Test Name";
-const cardId = "XXXXXXXXXXXXXXXX";
+const cardId = "xxxxxxxxxxxxxxxx";
 const date = new Date().toLocaleDateString();
 
 describe("e2eテスト", () => {
@@ -55,7 +55,7 @@ describe("e2eテスト", () => {
       } catch (e) {
         return e.response;
       }
-    }, `${samApiUrl}/user/AAAAAAAAAAAAAAAA`);
+    }, `${samApiUrl}/user/aaaaaaaaaaaaaaaa`);
     expect(result.status).toBe(404);
     expect(result.data.exists).toBeFalsy();
   });
@@ -84,7 +84,7 @@ describe("e2eテスト", () => {
       } catch (e) {
         return e.response;
       }
-    }, `${samApiUrl}/user/XXXXXXXXXXXXXXXX`);
+    }, `${samApiUrl}/user/xxxxxxxxxxxxxxxx`);
     expect(result.status).toBe(404);
     expect(result.data.exists).toBeTruthy();
   });
@@ -99,7 +99,7 @@ describe("e2eテスト", () => {
         }
       },
       {
-        url: `${samApiUrl}/user/XXXXXXXXXXXXXXXX/entry`,
+        url: `${samApiUrl}/user/xxxxxxxxxxxxxxxx/entry`,
         data: { purpose: "MEET_UP" },
       }
     );
@@ -113,7 +113,7 @@ describe("e2eテスト", () => {
       } catch (e) {
         return e.response;
       }
-    }, `${samApiUrl}/user/XXXXXXXXXXXXXXXX`);
+    }, `${samApiUrl}/user/xxxxxxxxxxxxxxxx`);
     expect(result.status).toBe(200);
     expect(result.data).toEqual({
       userId,
@@ -134,7 +134,7 @@ describe("e2eテスト", () => {
         }
       },
       {
-        url: `${samApiUrl}/user/XXXXXXXXXXXXXXXX/exit`,
+        url: `${samApiUrl}/user/xxxxxxxxxxxxxxxx/exit`,
       }
     );
     expect(result.status).toBe(200);

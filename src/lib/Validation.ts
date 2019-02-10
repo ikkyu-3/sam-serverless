@@ -73,7 +73,7 @@ class Validation {
     return true;
   }
 
-  private static cardIdRegExp = /[0-9A-Z]{16}/;
+  private static cardIdRegExp = /[0-9a-z]{16}/;
   private static userIdRegExp = /[0-9]{10}/;
 
   private static canParseBody(body: any): boolean {

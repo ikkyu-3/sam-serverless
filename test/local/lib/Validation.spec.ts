@@ -6,7 +6,7 @@ describe("Validation.ts", () => {
       expect(
         Validation.validateRequestBodyForSaving(
           JSON.stringify({
-            cardId: "XXXXXXXXXXXXXXXX",
+            cardId: "xxxxxxxxxxxxxxxx",
             userId: "0000000000",
             name: "name",
           })
@@ -28,7 +28,7 @@ describe("Validation.ts", () => {
       expect(
         Validation.validateRequestBodyForSaving(
           JSON.stringify({
-            cardId: "XXXXXXXXXXXXXXXX",
+            cardId: "xxxxxxxxxxxxxxxx",
             userId: "aaaaaaaaaa",
             name: "name",
           })
@@ -38,7 +38,7 @@ describe("Validation.ts", () => {
       expect(
         Validation.validateRequestBodyForSaving(
           JSON.stringify({
-            cardId: "XXXXXXXXXXXXXXXX",
+            cardId: "xxxxxxxxxxxxxxxx",
             userId: "aaaaaaaaaa",
           })
         )
@@ -87,7 +87,7 @@ describe("Validation.ts", () => {
   describe("validateCardId", () => {
     it("引数の文字列が正しい場合、trueを返す", () => {
       expect(
-        Validation.validateCardId({ cardId: "XXXXXXXXXXXXXXXX" })
+        Validation.validateCardId({ cardId: "xxxxxxxxxxxxxxxx" })
       ).toBeTruthy();
     });
 

@@ -45,7 +45,7 @@ class TestModel extends SamModel {
   }
 }
 
-describe("BaseModel.ts", () => {
+describe("SamModel.ts", () => {
   const dynamo = new AWS.DynamoDB({ endpoint, region });
   const testModel = new TestModel({ endpoint, region });
 
@@ -84,17 +84,17 @@ describe("BaseModel.ts", () => {
   describe("get", () => {
     it("指定した項目が取得できる", async () => {
       const response = (await testModel.get({
-        Key: { Id: "001" },
+        Key: { Id: "0000000001" },
         TableName: testTable,
       })) as AWS.DynamoDB.DocumentClient.GetItemOutput;
       expect(response).toEqual({
-        Item: { Id: "001", Name: "名前" },
+        Item: { Id: "0000000001", Name: "名前" },
       });
     });
 
     it("該当がない場合は、空のオブジェクトが取得できる", async () => {
       const response = (await testModel.get({
-        Key: { Id: "002" },
+        Key: { Id: "0000000002" },
         TableName: testTable,
       })) as AWS.DynamoDB.DocumentClient.GetItemOutput;
       expect(response).toEqual({});
@@ -113,7 +113,7 @@ describe("BaseModel.ts", () => {
   describe("put", () => {
     it("項目を追加できる", async () => {
       await testModel.put({
-        Item: { Id: "002", Name: "name" },
+        Item: { Id: "0000000002", Name: "name" },
         TableName: testTable,
       });
 
@@ -122,19 +122,19 @@ describe("BaseModel.ts", () => {
         .getItem({
           Key: {
             Id: {
-              S: "002",
+              S: "0000000002",
             },
           },
           TableName: testTable,
         })
         .promise()) as AWS.DynamoDB.GetItemOutput;
-      expect(response.Item!.Id.S).toBe("002");
+      expect(response.Item!.Id.S).toBe("0000000002");
       expect(response.Item!.Name.S).toBe("name");
     });
 
     it("項目を変更できる", async () => {
       await testModel.put({
-        Item: { Id: "002", Name: "name2", Age: 31 },
+        Item: { Id: "0000000002", Name: "name2", Age: 31 },
         TableName: testTable,
       });
 
@@ -142,12 +142,12 @@ describe("BaseModel.ts", () => {
       const response = (await dynamo
         .getItem({
           Key: {
-            Id: { S: "002" },
+            Id: { S: "0000000002" },
           },
           TableName: testTable,
         })
         .promise()) as AWS.DynamoDB.GetItemOutput;
-      expect(response.Item!.Id.S).toBe("002");
+      expect(response.Item!.Id.S).toBe("0000000002");
       expect(response.Item!.Name.S).toBe("name2");
       expect(response.Item!.Age.N).toBe("31");
     });
@@ -167,7 +167,7 @@ describe("BaseModel.ts", () => {
       await dynamo
         .putItem({
           Item: {
-            Id: { S: "003" },
+            Id: { S: "0000000003" },
             Name: { S: "名前3" },
           },
           ReturnConsumedCapacity: "TOTAL",
@@ -178,7 +178,7 @@ describe("BaseModel.ts", () => {
       await testModel.update({
         ExpressionAttributeNames: { "#n": "Name" },
         ExpressionAttributeValues: { ":n": "name3" },
-        Key: { Id: "003" },
+        Key: { Id: "0000000003" },
         TableName: testTable,
         UpdateExpression: "SET #n = :n",
       });
@@ -186,7 +186,7 @@ describe("BaseModel.ts", () => {
       const result = (await dynamo
         .getItem({
           Key: {
-            Id: { S: "003" },
+            Id: { S: "0000000003" },
           },
           TableName: testTable,
         })
@@ -200,7 +200,7 @@ describe("BaseModel.ts", () => {
         ConditionExpression: "SET #n = :n",
         ExpressionAttributeNames: { "#n": "Name" },
         ExpressionAttributeValues: { ":n": "name3" },
-        Key: { Id: "003" },
+        Key: { Id: "0000000003" },
         TableName: testTable,
       })) as AWS.AWSError;
 
@@ -213,11 +213,11 @@ describe("BaseModel.ts", () => {
     it("項目を取得できる", async () => {
       const response = (await testModel.query({
         ExpressionAttributeNames: { "#key": "Id" },
-        ExpressionAttributeValues: { ":value": "001" },
+        ExpressionAttributeValues: { ":value": "0000000001" },
         KeyConditionExpression: "#key = :value",
         TableName: testTable,
       })) as AWS.DynamoDB.DocumentClient.QueryOutput;
-      expect(response.Items).toEqual([{ Id: "001", Name: "名前" }]);
+      expect(response.Items).toEqual([{ Id: "0000000001", Name: "名前" }]);
     });
 
     it("例外が発生した場合は、AWSErrorを返す", async () => {

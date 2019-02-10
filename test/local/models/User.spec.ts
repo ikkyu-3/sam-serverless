@@ -35,7 +35,7 @@ describe("User.ts", () => {
   describe("findByCardId", () => {
     it("cardIdに該当する項目を取得できる", async () => {
       const response = (await user.findByCardId(
-        "WWWWWWWWWWWWWWWW"
+        "wwwwwwwwwwwwwwww"
       )) as IUserItem;
       expect(response.userId).toBe("0000000001");
       expect(response.name).toBe("name");
@@ -45,7 +45,7 @@ describe("User.ts", () => {
     });
 
     it("cardIdに該当しない場合はundefinedを返す", async () => {
-      const response = await user.findByCardId("YYYYYYYYYYYYYYYY");
+      const response = await user.findByCardId("yyyyyyyyyyyyyyyy");
       expect(response).toBeUndefined();
     });
   });
@@ -53,7 +53,7 @@ describe("User.ts", () => {
   describe("save", () => {
     it("新規に項目ができる", async () => {
       const response = await user.save({
-        cardId: "ZZZZZZZZZZZZZZZZ",
+        cardId: "zzzzzzzzzzzzzzzz",
         name: "name2",
         userId: "0000000002",
       });
@@ -62,7 +62,7 @@ describe("User.ts", () => {
       // 検証
       const newUser = (await dynamo
         .getItem({
-          Key: { cardId: { S: "ZZZZZZZZZZZZZZZZ" } },
+          Key: { cardId: { S: "zzzzzzzzzzzzzzzz" } },
           TableName: usersTable,
         })
         .promise()) as AWS.DynamoDB.GetItemOutput;
@@ -76,7 +76,7 @@ describe("User.ts", () => {
 
     it("既に登録されている場合は、nameが更新される", async () => {
       const response = await user.save({
-        cardId: "ZZZZZZZZZZZZZZZZ",
+        cardId: "zzzzzzzzzzzzzzzz",
         name: "名前2",
         userId: "0000000002",
       });
@@ -85,7 +85,7 @@ describe("User.ts", () => {
       // 検証
       const newUser = (await dynamo
         .getItem({
-          Key: { cardId: { S: "ZZZZZZZZZZZZZZZZ" } },
+          Key: { cardId: { S: "zzzzzzzzzzzzzzzz" } },
           TableName: usersTable,
         })
         .promise()) as AWS.DynamoDB.GetItemOutput;
@@ -96,7 +96,7 @@ describe("User.ts", () => {
 
     it("userIdが違う場合は、400を返す", async () => {
       const response = await user.save({
-        cardId: "ZZZZZZZZZZZZZZZZ",
+        cardId: "zzzzzzzzzzzzzzzz",
         name: "名前2",
         userId: "9999999999",
       });
