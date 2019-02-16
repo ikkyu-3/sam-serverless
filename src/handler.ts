@@ -112,6 +112,13 @@ export async function putUserExit(event: APIGatewayProxyEvent) {
  * GET /users
  */
 export async function getUsers() {
-  const response = await new Access(options).getUsersToday();
+  const response = await new Access(options).getParticipants();
   return response;
+}
+
+/**
+ * Step Functions: 退出処理
+ */
+export async function executeExitProcessAll() {
+  return await new Access(options).executeExitProcessAll();
 }

@@ -26,6 +26,7 @@ process.env.REGION = region;
 process.env.END_POINT = endpoint;
 
 import {
+  executeExitProcessAll,
   getUsers,
   getUserStatus,
   putUser,
@@ -328,6 +329,39 @@ describe("handler.ts", () => {
           },
         ])
       );
+    });
+  });
+
+  describe("executeExitProcessAll", () => {
+    it("本日退室処理を行なっていない入退室記録に退出処理を行うことができる", async () => {
+      const response = await executeExitProcessAll();
+      expect(response).toBe(0);
+
+      const { Items } = await dynamo
+        .query({
+          TableName: accessesTable,
+          IndexName: "date-index",
+          KeyConditionExpression: "#d = :d",
+          ExpressionAttributeNames: {
+            "#d": "date",
+          },
+          ExpressionAttributeValues: {
+            ":d": {
+              S: new Date().toLocaleDateString(),
+            },
+          },
+        })
+        .promise();
+
+      if (!Items || Items.length === 0) {
+        throw new Error();
+      }
+
+      Items.forEach(item => {
+        expect(
+          item.records.L![item.records.L!.length - 1].M!.exitTime
+        ).not.toBeUndefined();
+      });
     });
   });
 });

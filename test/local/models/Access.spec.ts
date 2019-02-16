@@ -4,6 +4,7 @@ import Access, { IUser } from "../../../src/models/Access";
 import {
   accessesTable,
   accessItemInput,
+  accessItemInput2,
   createAccessesTableInput,
   date,
   endpoint,
@@ -20,6 +21,7 @@ describe("Access.ts", () => {
     try {
       await dynamo.createTable(createAccessesTableInput).promise();
       await dynamo.putItem(accessItemInput).promise();
+      await dynamo.putItem(accessItemInput2).promise();
     } catch (e) {
       console.error("初期化に失敗しました。", e);
     }
@@ -204,9 +206,9 @@ describe("Access.ts", () => {
     });
   });
 
-  describe("getUsersToday", () => {
+  describe("getParticipants", () => {
     it("本日入室したユーザ一覧を取得できる", async () => {
-      const response = await access.getUsersToday();
+      const response = await access.getParticipants();
       const users = JSON.parse(response.body) as IUser[];
 
       expect(users).toEqual(
@@ -221,6 +223,39 @@ describe("Access.ts", () => {
           },
         ])
       );
+    });
+  });
+
+  describe("executeExitProcessAll", () => {
+    it("本日退室処理を行なっていない入退室記録に退出処理を行うことができる", async () => {
+      const response = await access.executeExitProcessAll();
+      expect(response).toBe(0);
+
+      const { Items } = await dynamo
+        .query({
+          TableName: accessesTable,
+          IndexName: "date-index",
+          KeyConditionExpression: "#d = :d",
+          ExpressionAttributeNames: {
+            "#d": "date",
+          },
+          ExpressionAttributeValues: {
+            ":d": {
+              S: new Date().toLocaleDateString(),
+            },
+          },
+        })
+        .promise();
+
+      if (!Items || Items.length === 0) {
+        throw new Error();
+      }
+
+      Items.forEach(item => {
+        expect(
+          item.records.L![item.records.L!.length - 1].M!.exitTime
+        ).not.toBeUndefined();
+      });
     });
   });
 });

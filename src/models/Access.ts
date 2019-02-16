@@ -12,7 +12,7 @@ interface IRecord {
   purpose: string;
 }
 
-interface IAccessItem {
+export interface IAccessItem {
   userId: string;
   date: string;
   name: string;
@@ -140,8 +140,8 @@ class Access extends SamModel {
 
     const date = new Date();
 
-    const currentRcord = accessItem.records[accessItem.records.length - 1];
-    currentRcord.exitTime = date.toLocaleString();
+    const currentRecord = accessItem.records[accessItem.records.length - 1];
+    currentRecord.exitTime = date.toLocaleString();
 
     const response = await this.update({
       TableName: this.ACCESSES_TABLE,
@@ -168,7 +168,7 @@ class Access extends SamModel {
     return LambdaResponse.ok();
   }
 
-  public async getUsersToday(): Promise<ILambdaResponse> {
+  public async getParticipants(): Promise<ILambdaResponse> {
     const response = await this.query({
       TableName: this.ACCESSES_TABLE,
       IndexName: "date-index",
@@ -197,6 +197,61 @@ class Access extends SamModel {
     });
 
     return LambdaResponse.ok(users);
+  }
+
+  public async executeExitProcessAll(): Promise<number> {
+    const querResponse = await this.query({
+      TableName: this.ACCESSES_TABLE,
+      IndexName: "date-index",
+      KeyConditionExpression: "#d = :d",
+      ExpressionAttributeNames: { "#d": "date" },
+      ExpressionAttributeValues: { ":d": new Date().toLocaleDateString() },
+    });
+
+    if (this.isAWSError(querResponse)) {
+      console.error("ERROR", JSON.stringify(querResponse, null, 4));
+      return 1;
+    }
+
+    const date = new Date().toLocaleDateString();
+    const time = new Date().toLocaleString();
+
+    const untreatedItems = (querResponse.Items! as IAccessItem[]).filter(
+      item => {
+        const currentRecord = item.records[item.records.length - 1];
+        return !currentRecord.exitTime;
+      }
+    );
+
+    for (const item of untreatedItems) {
+      item.records[item.records.length - 1].exitTime = time;
+      const param = {
+        TableName: this.ACCESSES_TABLE,
+        Key: { userId: item.userId, date },
+        UpdateExpression: "set #r = :r, #u = :u, #v = :newVersion",
+        ConditionExpression: "#v = :v",
+        ExpressionAttributeNames: {
+          "#r": "records",
+          "#u": "updatedAt",
+          "#v": "version",
+        },
+        ExpressionAttributeValues: {
+          ":r": item.records,
+          ":u": time,
+          ":v": item.version,
+          ":newVersion": item.version + 1,
+        },
+      };
+
+      const updateResponse = await this.update(param);
+
+      if (this.isAWSError(updateResponse)) {
+        console.error("response", JSON.stringify(updateResponse, null, 4));
+        console.error("param", JSON.stringify(param, null, 5));
+      }
+    }
+
+    return 0;
   }
 
   private async findByUserId(
