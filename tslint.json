@@ -13,7 +13,8 @@
           "semi": true,
           "trailingComma": "es5"
         }
-      ]
+      ],
+      "no-console": false
     },
     "rulesDirectory": ["tslint-plugin-prettier"],
     "linterOptions": {
