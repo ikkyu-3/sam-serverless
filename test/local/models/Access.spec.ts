@@ -228,8 +228,8 @@ describe("Access.ts", () => {
 
   describe("executeExitProcessAll", () => {
     it("本日退室処理を行なっていない入退室記録に退出処理を行うことができる", async () => {
-      const response = await access.executeExitProcessAll();
-      expect(response).toBe(0);
+      const result = await access.executeExitProcessAll();
+      expect(result).toBe(0);
 
       const { Items } = await dynamo
         .query({
@@ -256,6 +256,23 @@ describe("Access.ts", () => {
           item.records.L![item.records.L!.length - 1].M!.exitTime
         ).not.toBeUndefined();
       });
+    });
+  });
+
+  describe("createMailMessage", () => {
+    it("メール文を作成できる", async () => {
+      const message = await access.createMailMessage();
+      expect(message).toEqual(expect.any(String));
+      expect(/^<table>.+<\/table>?/.test(message)).toBeTruthy();
+    });
+
+    it("参加者が1人もいない場合、参加者がいない内容のメール文を作成できる", async () => {
+      await dynamo.deleteTable({ TableName: accessesTable }).promise();
+      await dynamo.createTable(createAccessesTableInput).promise();
+
+      const message = await access.createMailMessage();
+      expect(message).toEqual(expect.any(String));
+      expect(message).toBe("本日の参加者はいません😢");
     });
   });
 });

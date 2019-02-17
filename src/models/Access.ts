@@ -254,6 +254,56 @@ class Access extends SamModel {
     return 0;
   }
 
+  public async createMailMessage(): Promise<string> {
+    const response = await this.query({
+      TableName: this.ACCESSES_TABLE,
+      IndexName: "date-index",
+      KeyConditionExpression: "#d = :d",
+      ExpressionAttributeNames: { "#d": "date" },
+      ExpressionAttributeValues: { ":d": new Date().toLocaleDateString() },
+    });
+
+    if (this.isAWSError(response)) {
+      console.error("ERROR", JSON.stringify(response, null, 4));
+      return "⚠️failed⚠️処理中にエラーが発生しました。😱";
+    }
+
+    if (!response.Items || response.Items.length === 0) {
+      return "本日の参加者はいません😢";
+    }
+
+    // レスポンスデータを作成
+    let html =
+      "<table><thead><tr><th>名前</th><th>目的</th><th>入室時間</th><th>退室時間</th></tr></thead><tbody>";
+
+    (response.Items! as IAccessItem[]).forEach(({ name, records }) => {
+      const { purpose, entryTime, exitTime } = records[records.length - 1];
+
+      html += `<tr><td>${name}</td><td>${this.getPurposeForDisplay(
+        purpose
+      )}</td><td>${entryTime}</td><td>${exitTime || ""}</td></tr>`;
+    });
+
+    html += "</tbody></table>";
+
+    return html;
+  }
+
+  private getPurposeForDisplay(purpose: string): string {
+    switch (purpose) {
+      case "STUDY":
+        return "自習";
+      case "MEET_UP":
+        return "勉強会";
+      case "CIRCLE":
+        return "サークル";
+      case "WORK":
+        return "仕事";
+      default:
+        return "その他";
+    }
+  }
+
   private async findByUserId(
     userId: string
   ): Promise<IAccessItem | undefined | AWS.AWSError> {
