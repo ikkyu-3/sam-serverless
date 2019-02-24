@@ -1,4 +1,5 @@
 import { APIGatewayProxyEvent } from "aws-lambda";
+import { google } from "googleapis";
 import LambdaResponse from "./lib/LambdaResponse";
 import Validation, { IUserEnterBody, IUserSaveBody } from "./lib/Validation";
 import Access from "./models/Access";
@@ -128,4 +129,56 @@ export async function executeExitProcessAll() {
  */
 export async function getAccessesOfTody() {
   return await new Access(options).createMailMessage();
+}
+
+/**
+ * Step Functions: メール送信
+ */
+export async function sendMail(body: string) {
+  const credentials = await import(`${__dirname}/json/credentials.json`);
+  const token = await import(`${__dirname}/json/token.json`);
+  const fromMailAddress = process.env.FROM_MAIL_ADDRESS!;
+  const toMailAddress = process.env.TO_MAIL_ADDRESS!;
+
+  const { client_id, client_secret, redirect_uris } = credentials.installed;
+  const oAuth2Client = new google.auth.OAuth2(
+    client_id,
+    client_secret,
+    redirect_uris[0]
+  );
+  oAuth2Client.credentials = token;
+
+  const gmail = google.gmail({ version: "v1", auth: oAuth2Client });
+
+  const date = new Date();
+  const subject = `土曜開放入退室結果💪(${date.getFullYear()}年${date.getMonth() +
+    1}月${date.getDate()}日)`;
+  const utf8Subject = `=?utf-8?B?${Buffer.from(subject).toString("base64")}?=`;
+  const messageParts = [
+    `From: ${fromMailAddress}`,
+    `To: ${toMailAddress}`,
+    "Content-Type: text/html; charset=utf-8",
+    "Content-Transfer-Encoding: 7bit",
+    "MIME-Version: 1.0",
+    `Subject: ${utf8Subject}`,
+    "",
+    body,
+  ];
+  const message = messageParts.join("\n");
+
+  // The body needs to be base64url encoded.
+  const encodedMessage = Buffer.from(message)
+    .toString("base64")
+    .replace(/\+/g, "-")
+    .replace(/\//g, "_")
+    .replace(/=+$/, "");
+
+  const res = await gmail.users.messages.send({
+    userId: "me",
+    requestBody: {
+      raw: encodedMessage,
+    },
+  });
+
+  return res.status;
 }

@@ -70,3 +70,7 @@ jspm_packages
 serverless/handler.*
 serverless/lib
 serverless/models
+
+# google api
+src/json/*
+!.gitkeep

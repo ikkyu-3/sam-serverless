@@ -1,4 +1,7 @@
 /* tslint:disable no-console */
+import dotenv from "dotenv";
+dotenv.config();
+
 import * as AWS from "aws-sdk";
 import { ILambdaResponse } from "../../src/lib/LambdaResponse";
 import { IUserSaveBody } from "../../src/lib/Validation";
@@ -33,7 +36,10 @@ import {
   putUser,
   putUserEntry,
   putUserExit,
+  sendMail,
 } from "../../src/handler";
+
+jest.setTimeout(20000);
 
 const dynamo = new AWS.DynamoDB({ endpoint, region });
 
@@ -379,6 +385,13 @@ describe("handler.ts", () => {
 
       const response = await getAccessesOfTody();
       expect(response).toBe("本日の参加者はいません😢");
+    });
+  });
+
+  describe("sendMail", () => {
+    it("メールが送信できる", async () => {
+      const response = await sendMail("Test Body");
+      expect(response).toBe(200);
     });
   });
 });

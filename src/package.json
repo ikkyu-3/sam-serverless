@@ -1,0 +1,8 @@
+{
+  "name": "sam-serverless-lambda",
+  "version": "0.0.0",
+  "description": "Lambdaデプロイ用パッケージ",
+  "dependencies": {
+    "googleapis": "^37.2.0"
+  }
+}
