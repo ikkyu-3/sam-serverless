@@ -122,3 +122,10 @@ export async function getUsers() {
 export async function executeExitProcessAll() {
   return await new Access(options).executeExitProcessAll();
 }
+
+/**
+ * Step Functions: 本日の入退室情報を取得
+ */
+export async function getAccessesOfTody() {
+  return await new Access(options).createMailMessage();
+}

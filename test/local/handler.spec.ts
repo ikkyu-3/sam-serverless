@@ -27,6 +27,7 @@ process.env.END_POINT = endpoint;
 
 import {
   executeExitProcessAll,
+  getAccessesOfTody,
   getUsers,
   getUserStatus,
   putUser,
@@ -362,6 +363,22 @@ describe("handler.ts", () => {
           item.records.L![item.records.L!.length - 1].M!.exitTime
         ).not.toBeUndefined();
       });
+    });
+  });
+
+  describe("getAccessesOfTody", () => {
+    it("本日の入退室結果をHTML文字列で取得できる", async () => {
+      const response = await getAccessesOfTody();
+      expect(response).toEqual(expect.any(String));
+      expect(/^<table>.+<\/table>?/.test(response)).toBeTruthy();
+    });
+
+    it("本日の参加者が1人もいない場合、参加者がいない内容の文字列を取得できる", async () => {
+      await dynamo.deleteTable({ TableName: accessesTable }).promise();
+      await dynamo.createTable(createAccessesTableInput).promise();
+
+      const response = await getAccessesOfTody();
+      expect(response).toBe("本日の参加者はいません😢");
     });
   });
 });
