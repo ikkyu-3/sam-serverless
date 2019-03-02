@@ -4,9 +4,21 @@
   "description": "sta-access-manager-server × serverless × TypeScript",
   "main": "index.js",
   "scripts": {
-    "build": "tsc --noEmit && babel src --out-dir serverless --extensions .ts --source-maps inline",
-    "deploy": "npm run build && cd serverless && serverless deploy -v && cd -",
+    "create:nodejs-directory": "mkdir -p serverless/myLayer/nodejs",
+    "create:link": "ln -fs $(pwd)/package.json $(pwd)/serverless/myLayer/nodejs/package.json && ln -fs $(pwd)/package-lock.json $(pwd)/serverless/myLayer/nodejs/package-lock.json",
+    "create:token": "node getToken.js",
+    "init": "npm-run-all create:*",
+    "check": "tsc --noEmit",
+    "compile": "babel src --out-dir serverless --extensions .ts --source-maps inline",
+    "copy:json": "cp -r src/json serverless",
+    "install:layer": "npm i --prefix serverless/myLayer/nodejs --only=prod",
+    "build": "npm-run-all check compile copy:json install:layer",
+    "deploy:serverless": "cd serverless && serverless deploy -v && cd -",
+    "deploy": "npm-run-all build deploy:serverless",
     "remove": "cd serverless && serverless remove -v && cd -",
+    "deploy:serverless:prod": "cd serverless && serverless  deploy --stage prod --apiStage master -v && cd -",
+    "deploy:prod": "npm-run-all build deploy:serverless:prod",
+    "remove:prod": "cd serverless && serverless remove --stage prod --apiStage master -v && cd -",
     "test": "jest --runInBand --detectOpenHandles --forceExit"
   },
   "repository": {
@@ -21,19 +33,20 @@
   "homepage": "https://github.com/ikkyu-3/sam-serverless#readme",
   "devDependencies": {
     "@babel/cli": "^7.2.3",
-    "@babel/core": "^7.2.2",
-    "@babel/plugin-proposal-class-properties": "^7.3.0",
-    "@babel/plugin-proposal-object-rest-spread": "^7.3.2",
-    "@babel/preset-env": "^7.3.1",
-    "@babel/preset-typescript": "^7.1.0",
+    "@babel/core": "^7.3.4",
+    "@babel/plugin-proposal-class-properties": "^7.3.4",
+    "@babel/plugin-proposal-object-rest-spread": "^7.3.4",
+    "@babel/plugin-syntax-dynamic-import": "^7.2.0",
+    "@babel/preset-env": "^7.3.4",
+    "@babel/preset-typescript": "^7.3.3",
     "@types/aws-lambda": "^8.10.19",
     "@types/dotenv": "^6.1.0",
     "@types/expect-puppeteer": "^3.3.1",
     "@types/express": "^4.16.1",
-    "@types/jest": "^24.0.0",
-    "@types/jest-environment-puppeteer": "^2.2.1",
-    "@types/lodash": "^4.14.120",
-    "@types/node": "^10.12.24",
+    "@types/jest": "^24.0.9",
+    "@types/jest-environment-puppeteer": "^4.0.0",
+    "@types/lodash": "^4.14.121",
+    "@types/node": "^11.9.5",
     "@types/puppeteer": "^1.12.1",
     "axios": "^0.18.0",
     "babel-jest": "^24.1.0",
@@ -41,16 +54,17 @@
     "express": "^4.16.4",
     "husky": "^1.3.1",
     "jest": "^24.1.0",
-    "jest-puppeteer": "3.9.0",
-    "lint-staged": "^8.1.3",
+    "jest-puppeteer": "4.0.0",
+    "lint-staged": "^8.1.4",
+    "npm-run-all": "^4.1.5",
     "prettier": "^1.16.4",
     "puppeteer": "^1.12.2",
-    "serverless": "^1.37.1",
-    "ts-jest": "^23.10.5",
-    "tslint": "^5.12.1",
+    "serverless": "^1.38.0",
+    "ts-jest": "^24.0.0",
+    "tslint": "^5.13.0",
     "tslint-config-prettier": "^1.18.0",
     "tslint-plugin-prettier": "^2.0.1",
-    "typescript": "^3.3.3"
+    "typescript": "^3.3.3333"
   },
   "husky": {
     "hooks": {
@@ -64,7 +78,8 @@
     ]
   },
   "dependencies": {
-    "aws-sdk": "^2.400.0",
+    "aws-sdk": "^2.411.0",
+    "googleapis": "^37.2.0",
     "lodash": "^4.17.11"
   }
 }
