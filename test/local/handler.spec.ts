@@ -375,8 +375,8 @@ describe("handler.ts", () => {
   describe("getAccessesOfTody", () => {
     it("本日の入退室結果をHTML文字列で取得できる", async () => {
       const response = await getAccessesOfTody();
-      expect(response).toEqual(expect.any(String));
-      expect(/^<table>.+<\/table>?/.test(response)).toBeTruthy();
+      expect(response.message).toEqual(expect.any(String));
+      expect(/^<table>.+<\/table>?/.test(response.message)).toBeTruthy();
     });
 
     it("本日の参加者が1人もいない場合、参加者がいない内容の文字列を取得できる", async () => {
@@ -384,7 +384,7 @@ describe("handler.ts", () => {
       await dynamo.createTable(createAccessesTableInput).promise();
 
       const response = await getAccessesOfTody();
-      expect(response).toBe("本日の参加者はいません😢");
+      expect(response.message).toBe("本日の参加者はいません😢");
     });
   });
 

@@ -261,7 +261,7 @@ describe("Access.ts", () => {
 
   describe("createMailMessage", () => {
     it("メール文を作成できる", async () => {
-      const message = await access.createMailMessage();
+      const { message } = await access.createMailMessage();
       expect(message).toEqual(expect.any(String));
       expect(/^<table>.+<\/table>?/.test(message)).toBeTruthy();
     });
@@ -270,7 +270,7 @@ describe("Access.ts", () => {
       await dynamo.deleteTable({ TableName: accessesTable }).promise();
       await dynamo.createTable(createAccessesTableInput).promise();
 
-      const message = await access.createMailMessage();
+      const { message } = await access.createMailMessage();
       expect(message).toEqual(expect.any(String));
       expect(message).toBe("本日の参加者はいません😢");
     });

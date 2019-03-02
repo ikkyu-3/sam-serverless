@@ -1,9 +1,13 @@
 import { APIGatewayProxyEvent } from "aws-lambda";
+import { readFile } from "fs";
 import { google } from "googleapis";
+import { promisify } from "util";
 import LambdaResponse from "./lib/LambdaResponse";
 import Validation, { IUserEnterBody, IUserSaveBody } from "./lib/Validation";
 import Access from "./models/Access";
 import User from "./models/User";
+
+const readFilePromise = promisify(readFile);
 
 const options = {
   region: process.env.REGION,
@@ -135,8 +139,13 @@ export async function getAccessesOfTody() {
  * Step Functions: メール送信
  */
 export async function sendMail(body: string) {
-  const credentials = await import(`${__dirname}/json/credentials.json`);
-  const token = await import(`${__dirname}/json/token.json`);
+  const credentials = JSON.parse(
+    await readFilePromise(`${__dirname}/json/credentials.json`, "utf8")
+  );
+  const token = JSON.parse(
+    await readFilePromise(`${__dirname}/json/token.json`, "utf8")
+  );
+
   const fromMailAddress = process.env.FROM_MAIL_ADDRESS!;
   const toMailAddress = process.env.TO_MAIL_ADDRESS!;
 

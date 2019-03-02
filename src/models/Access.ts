@@ -31,6 +31,10 @@ export interface IUser {
   exitTime?: string;
 }
 
+export interface IMessage {
+  message: string;
+}
+
 class Access extends SamModel {
   private readonly ACCESSES_TABLE = process.env.ACCESSES_TABLE || "";
 
@@ -254,7 +258,7 @@ class Access extends SamModel {
     return 0;
   }
 
-  public async createMailMessage(): Promise<string> {
+  public async createMailMessage(): Promise<IMessage> {
     const response = await this.query({
       TableName: this.ACCESSES_TABLE,
       IndexName: "date-index",
@@ -265,11 +269,11 @@ class Access extends SamModel {
 
     if (this.isAWSError(response)) {
       console.error("ERROR", JSON.stringify(response, null, 4));
-      return "⚠️failed⚠️処理中にエラーが発生しました。😱";
+      return { message: "⚠️failed⚠️処理中にエラーが発生しました。😱" };
     }
 
     if (!response.Items || response.Items.length === 0) {
-      return "本日の参加者はいません😢";
+      return { message: "本日の参加者はいません😢" };
     }
 
     // レスポンスデータを作成
@@ -286,7 +290,7 @@ class Access extends SamModel {
 
     html += "</tbody></table>";
 
-    return html;
+    return { message: html };
   }
 
   private getPurposeForDisplay(purpose: string): string {
