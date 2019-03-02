@@ -2,7 +2,7 @@ Resources:
   UsersTable:
     Type: AWS::DynamoDB::Table
     Properties:
-      TableName: Users
+      TableName: Users-${self:provider.stage}
       AttributeDefinitions:
         -
           AttributeName: cardId
@@ -18,7 +18,7 @@ Resources:
   AccessesTable:
     Type: AWS::DynamoDB::Table
     Properties:
-      TableName: Accesses
+      TableName: Accesses-${self:provider.stage}
       AttributeDefinitions:
         -
           AttributeName: userId
