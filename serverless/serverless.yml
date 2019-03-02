@@ -10,6 +10,8 @@ custom:
 
 plugins:
   - serverless-dotenv-plugin
+  - serverless-step-functions
+  - serverless-pseudo-parameters
 
 provider:
   name: aws
@@ -95,6 +97,34 @@ functions:
     name: sam-server-stepFunction-sendMail-${self:provider.stage}
     layers:
       - {Ref: MyLayerLambdaLayer}
+
+stepFunctions:
+  stateMachines:
+    EndProcessing:
+      events:
+        - schedule: cron(0 9 ? * SAT *)
+      name: sam-end-processing-${self:provider.stage}
+      definition:
+        Comment: "sta-access-manager 終了処理"
+        StartAt: ExecuteExitProcessAll
+        States:
+          ExecuteExitProcessAll:
+            Type: Task
+            Resource: arn:aws:lambda:#{AWS::Region}:#{AWS::AccountId}:function:sam-server-stepFunction-executeExitProcessAll-${self:provider.stage}
+            Next: GetAccessesOfToday
+          GetAccessesOfToday:
+            Type: Task
+            Resource: arn:aws:lambda:#{AWS::Region}:#{AWS::AccountId}:function:sam-server-stepFunction-getAccessesOfTody-${self:provider.stage}
+            Next: SendMail
+          SendMail:
+            Type: Task
+            InputPath: $.message
+            Resource: arn:aws:lambda:#{AWS::Region}:#{AWS::AccountId}:function:sam-server-stepFunction-sendMail-${self:provider.stage}
+            End: true
+      dependsOn:
+        - ExecuteExitProcessAllLambdaFunction
+        - GetAccessesOfTodyLambdaFunction
+        - SendMailLambdaFunction
 
 # you can add CloudFormation resource templates here
 resources:

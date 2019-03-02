@@ -61,6 +61,8 @@
     "puppeteer": "^1.12.2",
     "serverless": "^1.38.0",
     "serverless-dotenv-plugin": "^2.0.1",
+    "serverless-pseudo-parameters": "^2.4.0",
+    "serverless-step-functions": "^1.13.0",
     "ts-jest": "^24.0.0",
     "tslint": "^5.13.0",
     "tslint-config-prettier": "^1.18.0",
