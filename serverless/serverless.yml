@@ -10,7 +10,7 @@ provider:
   region: ${opt:region, "ap-northeast-1"}
   profile: ${opt:profile, "default"}
   stage: ${opt:stage, "dev"}
-  apiStage: ${opt:apiStage, "master"}
+  apiStage: ${opt:apiStage, "test"}
   memorySize: 512 # optional, in MB, default is 1024
   timeout: 10 # optional, in seconds, default is 6
   versionFunctions: false # optional, default is true
@@ -33,38 +33,61 @@ provider:
         - dynamodb:DeleteItem
       Resource: "arn:aws:dynamodb:${self:provider.region}:*:*"
 
+layers:
+  MyLayer:
+    path: myLayer
+    name: sam-server-myLayer-${self:provider.stage}
+    compatibleRuntimes:
+      - nodejs8.10
+
 functions:
   PutUser:
     handler: handler.putUser
     name: sam-server-putUser-${self:provider.stage}
+    layers:
+      - {Ref: MyLayerLambdaLayer}
 
   GetUserStatus:
     handler: handler.getUserStatus
     name: sam-server-getUserStatus-${self:provider.stage}
+    layers:
+      - {Ref: MyLayerLambdaLayer}
 
   PutUserEntry:
     handler: handler.putUserEntry
     name: sam-server-putUserEntry-${self:provider.stage}
+    layers:
+      - {Ref: MyLayerLambdaLayer}
 
   PutUserExit:
     handler: handler.putUserExit
     name: sam-server-putUserExit-${self:provider.stage}
+    layers:
+      - {Ref: MyLayerLambdaLayer}
 
   GetUsers:
     handler: handler.getUsers
     name: sam-server-getUsers-${self:provider.stage}
+    layers:
+      - {Ref: MyLayerLambdaLayer}
 
   ExecuteExitProcessAll:
     handler: handler.executeExitProcessAll
     name: sam-server-stepFunction-executeExitProcessAll-${self:provider.stage}
+    layers:
+      - {Ref: MyLayerLambdaLayer}
 
   GetAccessesOfTody:
     handler: handler.getAccessesOfTody
     name: sam-server-stepFunction-getAccessesOfTody-${self:provider.stage}
+    layers:
+      - {Ref: MyLayerLambdaLayer}
 
   SendMail:
     handler: handler.sendMail
     name: sam-server-stepFunction-sendMail-${self:provider.stage}
+    layers:
+      - {Ref: MyLayerLambdaLayer}
 
 # you can add CloudFormation resource templates here
 resources:
