@@ -68,8 +68,11 @@ jspm_packages
 .serverless
 
 serverless/handler.*
+serverless/json/*
 serverless/lib
 serverless/models
+serverless/myLayer/nodejs/package.json
+serverless/myLayer/nodejs/package-lock.json
 
 # google api
 src/json/*
