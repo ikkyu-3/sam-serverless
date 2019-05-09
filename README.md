@@ -30,3 +30,15 @@
 
 - 変更が発生したらREADME.mdを更新していきます。
 - 基本ブランチは分けずにコミットする。開発後はブランチを分ける考えでいます。
+
+## 準備
+
+### .env作成
+
+```.env
+E2E_TEST_SERVER= # テストサーバ
+SAM_API_URL= # APIのURL
+REGION= # リージョン
+FROM_MAIL_ADDRESS= # 送信者のメールアドレス
+TO_MAIL_ADDRESS= # 受信者のメールアドレス
+```
